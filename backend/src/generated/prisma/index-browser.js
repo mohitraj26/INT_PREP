@@ -137,7 +137,7 @@ exports.Prisma.ProblemScalarFieldEnum = {
   userId: 'userId',
   examples: 'examples',
   constraints: 'constraints',
-  Hints: 'Hints',
+  hints: 'hints',
   editorial: 'editorial',
   testcases: 'testcases',
   codeSnippets: 'codeSnippets',
@@ -148,8 +148,8 @@ exports.Prisma.ProblemScalarFieldEnum = {
 
 exports.Prisma.SubmissionScalarFieldEnum = {
   id: 'id',
-  problemId: 'problemId',
   userId: 'userId',
+  problemId: 'problemId',
   sourceCode: 'sourceCode',
   language: 'language',
   stdin: 'stdin',
@@ -182,6 +182,23 @@ exports.Prisma.TestCaseResultScalarFieldEnum = {
 exports.Prisma.ProblemSolvedScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  problemId: 'problemId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PlaylistScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  userId: 'userId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProblemInPlaylistScalarFieldEnum = {
+  id: 'id',
+  playListId: 'playListId',
   problemId: 'problemId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -227,7 +244,9 @@ exports.Prisma.ModelName = {
   Problem: 'Problem',
   Submission: 'Submission',
   TestCaseResult: 'TestCaseResult',
-  ProblemSolved: 'ProblemSolved'
+  ProblemSolved: 'ProblemSolved',
+  Playlist: 'Playlist',
+  ProblemInPlaylist: 'ProblemInPlaylist'
 };
 
 /**
