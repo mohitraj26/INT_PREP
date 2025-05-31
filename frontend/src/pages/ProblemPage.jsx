@@ -36,7 +36,7 @@ const ProblemPage = () => {
 
     const [code , setCode] = useState("");
     const [activeTab , setActiveTab] = useState("description");
-    const [selectedLanguage , setSelectedLanguage] = useState("javascript");
+    const [selectedLanguage , setSelectedLanguage] = useState("JAVASCRIPT");
     const [isBookmarked , setIsBookmarked] = useState(false);
     const [testCases , setTestCases] = useState([]);
 
@@ -208,7 +208,7 @@ const ProblemPage = () => {
           </Link>
           <div className="mt-2">
             <h1 className="text-xl font-bold">{problem.title}</h1>
-            <div className="flex items-center gap-2 text-sm text-base-content/70 mt-5">
+            <div className="flex items-center gap-2 text-sm text-base-content/70 mt-3">
               <Clock className="w-4 h-4" />
               <span>
                 Updated{" "}
@@ -227,6 +227,25 @@ const ProblemPage = () => {
             </div>
           </div>
         </div>
+        
+
+    {/* Centered Buttons */}
+      <div className="absolute left-1/2 transform -translate-x-1/2">
+        <div className="flex gap-2">
+          <button
+            className={`btn btn-primary gap-2 ${isExecuting ? "loading" : ""}`}
+            onClick={handleRunCode}
+            disabled={isExecuting}
+          >
+            {!isExecuting && <Play className="w-4 h-4" />}
+            Run
+          </button>
+          <button className="btn btn-success gap-2">
+            Submit
+          </button>
+        </div>
+      </div>
+
         <div className="flex-none gap-4">
           <button
             className={`btn btn-ghost btn-circle ${
@@ -252,42 +271,37 @@ const ProblemPage = () => {
           </select>
         </div>
       </nav>
-        <div className="container mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="container mx-auto p-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3"> 
           <div className="card bg-base-100 shadow-xl">
-            <div className="card-body p-0">
+            {/* Set a fixed height and make layout column-based */}
+            <div className="card-body p-0 h-[80vh] flex flex-col overflow-hidden">
+              
+              {/* Tabs stay fixed at top */}
               <div className="tabs tabs-bordered">
                 <button
-                  className={`tab gap-2 ${
-                    activeTab === "description" ? "tab-active" : ""
-                  }`}
+                  className={`tab gap-2 ${activeTab === "description" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("description")}
                 >
                   <FileText className="w-4 h-4" />
                   Description
                 </button>
                 <button
-                  className={`tab gap-2 ${
-                    activeTab === "submissions" ? "tab-active" : ""
-                  }`}
+                  className={`tab gap-2 ${activeTab === "submissions" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("submissions")}
                 >
                   <Code2 className="w-4 h-4" />
                   Submissions
                 </button>
                 <button
-                  className={`tab gap-2 ${
-                    activeTab === "discussion" ? "tab-active" : ""
-                  }`}
+                  className={`tab gap-2 ${activeTab === "discussion" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("discussion")}
                 >
                   <MessageSquare className="w-4 h-4" />
                   Discussion
                 </button>
                 <button
-                  className={`tab gap-2 ${
-                    activeTab === "hints" ? "tab-active" : ""
-                  }`}
+                  className={`tab gap-2 ${activeTab === "hints" ? "tab-active" : ""}`}
                   onClick={() => setActiveTab("hints")}
                 >
                   <Lightbulb className="w-4 h-4" />
@@ -295,7 +309,11 @@ const ProblemPage = () => {
                 </button>
               </div>
 
-              <div className="p-6">{renderTabContent()}</div>
+              {/* Scrollable tab content */}
+              <div className="p-6 overflow-y-auto flex-1">
+                {renderTabContent()}
+              </div>
+
             </div>
           </div>
 
@@ -308,7 +326,7 @@ const ProblemPage = () => {
                 </button>
               </div>
 
-              <div className="h-[600px] w-full">
+              <div className="h-[540px] w-full">
                 <Editor
                   height="100%"
                   language={selectedLanguage.toLowerCase()}
@@ -317,7 +335,7 @@ const ProblemPage = () => {
                   onChange={(value) => setCode(value || "")}
                   options={{
                     minimap: { enabled: false },
-                    fontSize: 20,
+                    fontSize: 18,
                     lineNumbers: "on",
                     roundedSelection: false,
                     scrollBeyondLastLine: false,
@@ -325,22 +343,6 @@ const ProblemPage = () => {
                     automaticLayout: true,
                   }}
                 />
-              </div>
-
-              <div className="p-4 border-t border-base-300 bg-base-200">
-                <div className="flex justify-between items-center">
-                  <button
-                    className={`btn btn-primary gap-2 ${isExecuting ? "loading" : ""}`}
-                    onClick={handleRunCode}
-                    disabled={isExecuting}
-                  >
-                    {!isExecuting && <Play className="w-4 h-4" />}
-                    Run Code
-                  </button>
-                  <button className="btn btn-success gap-2">
-                    Submit Solution
-                  </button>
-                </div>
               </div>
 
             </div>

@@ -21,7 +21,9 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.4",
     "react-hot-toast": "^2.5.2",
+    "react-resizable": "^3.0.5",
     "react-router-dom": "^7.6.1",
+    "react-split-pane": "^0.1.92",
     "tailwindcss": "^4.1.7",
     "zod": "^3.25.28",
     "zustand": "^5.0.5"

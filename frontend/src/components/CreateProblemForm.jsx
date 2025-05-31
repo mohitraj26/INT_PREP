@@ -380,23 +380,23 @@ const sampleStringProblem = {
     console.log(result ? "true" : "false");
     rl.close();
   });`,
-    PYTHON: `class Solution:
-      def isPalindrome(self, s: str) -> bool:
-          # Write your code here
-          pass
+  PYTHON: `class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        # Write your code here
+        pass
   
   # Input parsing
-  if __name__ == "__main__":
-      import sys
-      # Read the input string
-      s = sys.stdin.readline().strip()
-      
-      # Call solution
-      sol = Solution()
-      result = sol.isPalindrome(s)
-      
-      # Output result
-      print(str(result).lower())  # Convert True/False to lowercase true/false`,
+if __name__ == "__main__":
+    import sys
+    # Read the input string
+    s = sys.stdin.readline().strip()
+    
+    # Call solution
+    sol = Solution()
+    result = sol.isPalindrome(s)
+    
+    # Output result
+    print(str(result).lower())  # Convert True/False to lowercase true/false`,
     JAVA: `import java.util.Scanner;
 
 public class Main {
@@ -459,26 +459,26 @@ public class Main {
     console.log(result ? "true" : "false");
     rl.close();
   });`,
-    PYTHON: `class Solution:
-      def isPalindrome(self, s: str) -> bool:
-          # Convert to lowercase and keep only alphanumeric characters
-          filtered_chars = [c.lower() for c in s if c.isalnum()]
-          
-          # Check if it's a palindrome
-          return filtered_chars == filtered_chars[::-1]
+  PYTHON: `class Solution:
+    def isPalindrome(self, s: str) -> bool:
+        # Convert to lowercase and keep only alphanumeric characters
+        filtered_chars = [c.lower() for c in s if c.isalnum()]
+        
+        # Check if it's a palindrome
+        return filtered_chars == filtered_chars[::-1]
   
   # Input parsing
-  if __name__ == "__main__":
-      import sys
-      # Read the input string
-      s = sys.stdin.readline().strip()
-      
-      # Call solution
-      sol = Solution()
-      result = sol.isPalindrome(s)
-      
-      # Output result
-      print(str(result).lower())  # Convert True/False to lowercase true/false`,
+if __name__ == "__main__":
+    import sys
+    # Read the input string
+    s = sys.stdin.readline().strip()
+    
+    # Call solution
+    sol = Solution()
+    result = sol.isPalindrome(s)
+    
+    # Output result
+    print(str(result).lower())  # Convert True/False to lowercase true/false`,
     JAVA: `import java.util.Scanner;
 
 public class Main {
@@ -580,13 +580,15 @@ const CreateProblemForm = () => {
 
   const loadSampleData=()=>{
     const sampleData = sampleType === "DP" ? sampledpData : sampleStringProblem
+    console.log("Loading sample data:", sampleData);
+
   
    replaceTags(sampleData.tags.map((tag) => tag));
     replacetestcases(sampleData.testcases.map((tc) => tc));
 
    // Reset the form with sample data
     reset(sampleData);
-}
+  }
 
   return (
     <div className='container mx-auto py-8 px-4 max-w-7xl'>
@@ -605,7 +607,7 @@ const CreateProblemForm = () => {
                   className={`btn join-item ${
                     sampleType === "DP" ? "btn-active" : ""
                   }`}
-                  onClick={() => setSampleType("array")}
+                  onClick={() => setSampleType("DP")}
                 >
                   DP Problem
                 </button>

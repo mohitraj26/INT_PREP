@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* global.css or index.css */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 @keyframes blink {
     0%,
     100% {
