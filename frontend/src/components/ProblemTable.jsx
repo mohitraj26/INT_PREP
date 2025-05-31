@@ -3,16 +3,24 @@ import {useAuthStore} from "../store/useAuthStore"
 import {Link} from "react-router-dom"
 import { Bookmark, PencilIcon, Trash, TrashIcon, Plus, Loader2 } from "lucide-react";
 import { useAction } from '../store/useAction';
+import { usePlaylistStore } from '../store/usePlaylistStore';
+import CreatePlaylistModal from './CreatePlaylistModal';
+import AddToPlaylist from './AddToPlayList';
+import { set } from 'react-hook-form';
 
 
 const ProblemTable = ({problems}) => {
     const {authUser} = useAuthStore();
     const {onDeleteProblem, isDeletingProblem} = useAction();
+    const {createPlaylist} = usePlaylistStore();
 
     const [search , setSearch] = useState("");
     const [difficulty , setDifficulty] = useState("ALL");
     const [selectedTag, setSelectedTag] = useState("ALL");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isCreateModalOpen , setIsCreateModalOpen] = useState(false);
+    const [isAddToPlaylistModalOpen , setIsAddToPlaylistModalOpen] = useState(false);
+    const [selectedProblemId , setSelectedProblemId] = useState(null);
 
     const allTags = useMemo(() => {
         if(!Array.isArray(problems)) return [];
@@ -44,7 +52,16 @@ const ProblemTable = ({problems}) => {
     const handleDelete = (id)=>{
       onDeleteProblem(id);
     }
+    const handleAddToPlaylist = (problemId) => {
+      setSelectedProblemId(problemId);
+      setIsAddToPlaylistModalOpen(true);      
+    }
 
+
+    const handleCreatePlaylist = async(playlistData)=>{
+      await createPlaylist(playlistData);
+      setIsCreateModalOpen(false);
+    }
 
   return (
     <div className='w-full max-w-6xl mx-auto mt-10'>
@@ -53,7 +70,7 @@ const ProblemTable = ({problems}) => {
         <h2 className="text-2xl font-bold">Problems</h2>
         <button
           className="btn btn-primary gap-2"
-          onClick={() =>{}}
+          onClick={() =>{setIsCreateModalOpen(true);}}
         >
           <Plus className="w-4 h-4" />
           Create Playlist
@@ -172,7 +189,7 @@ const ProblemTable = ({problems}) => {
                         )}
                         <button
                           className="btn btn-sm btn-outline flex gap-2 items-center"
-                          onClick={() => {}}
+                          onClick={() => handleAddToPlaylist(problem.id)}
                         >
                           <Bookmark className="w-4 h-4" />
                           <span className="hidden sm:inline">Save to Playlist</span>
@@ -213,7 +230,21 @@ const ProblemTable = ({problems}) => {
           Next
         </button>
       </div>
+    <CreatePlaylistModal
+      isOpen={isCreateModalOpen}
+      onClose={() => setIsCreateModalOpen(false)}
+      onSubmit={handleCreatePlaylist}
+    />
+
+    <AddToPlaylist
+      isOpen={isAddToPlaylistModalOpen}
+      onClose={() => setIsAddToPlaylistModalOpen(false)}
+      problemId={selectedProblemId}
+    />
+
+
     </div>
+
 
 
   )
