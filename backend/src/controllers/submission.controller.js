@@ -70,3 +70,36 @@ export const getAllTheSubmissionsForProblem = async(req , res)=>{
     }
 
 }
+
+// Get a unique submission by its ID
+export const getSubmissionById = async (req, res) => {
+  try {
+    const userId = req.user.id; // Assuming you want to ensure the user owns the submission
+    const submissionId = req.params.submissionId;
+
+    const submission = await db.submission.findUnique({
+      where: {
+        id: submissionId,
+        userId: userId, // Optional: Ensures only the owner can fetch their submission
+      },
+    });
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        message: "Submission not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Submission fetched successfully",
+      submission,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: "Error while fetching submission",
+    });
+  }
+};

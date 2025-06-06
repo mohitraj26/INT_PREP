@@ -7,6 +7,7 @@ export const useSubmissionStore = create((set, get) => ({
   submissions: [],
   submission: null,
   submissionCount: null,
+  uniqueSubmission: null,
 
   getAllSubmissions: async () => {
     try {
@@ -56,4 +57,23 @@ export const useSubmissionStore = create((set, get) => ({
       toast.error("Error getting submission count for problem");
     }
   },
+
+
+    getSubmissionById: async (submissionId) => {
+    try {
+      const res = await axiosInstance.get(
+        `/submission/get-submission-by-id/${submissionId}`
+      );
+      // Assuming the API returns the submission object directly
+      set({ uniqueSubmission: res.data.submission });
+      return res.data.submission;
+    } catch (error) {
+      console.log("Error getting submission by id", error);
+      toast.error("Error getting submission by id");
+       return null;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
 }));

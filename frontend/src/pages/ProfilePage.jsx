@@ -104,14 +104,14 @@ const ProfilePage = () => {
         
      
       </div>
-<div>
+      <div>
 
-<ProfileSubmission/>
-     
-      <ProblemSolvedByUser/>
+            {/* <ProfileSubmission/> */}
+          
+            <ProblemSolvedByUser/>
 
-      <PlaylistProfile/>
-</div>
+            <PlaylistProfile/>
+      </div>
       
       {/* PLaylist created by the user and their actions */}
     </div>
