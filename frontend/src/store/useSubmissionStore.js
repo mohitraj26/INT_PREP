@@ -8,6 +8,7 @@ export const useSubmissionStore = create((set, get) => ({
   submission: null,
   submissionCount: null,
   uniqueSubmission: null,
+  submissionCounts: [],
 
   getAllSubmissions: async () => {
     try {
@@ -59,7 +60,7 @@ export const useSubmissionStore = create((set, get) => ({
   },
 
 
-    getSubmissionById: async (submissionId) => {
+  getSubmissionById: async (submissionId) => {
     try {
       const res = await axiosInstance.get(
         `/submission/get-submission-by-id/${submissionId}`
@@ -75,5 +76,20 @@ export const useSubmissionStore = create((set, get) => ({
       set({ isLoading: false });
     }
   },
+
+  getSubmissionCountsByDate: async () => {
+    try {
+      const res = await axiosInstance.get(
+        '/submission/get-submissions-count-by-date'
+      );
+      set({ submissionCounts: res.data.values }); // assuming backend returns { values: [...] }
+      return res.data.values;
+    } catch (error) {
+      console.log("Error getting submission counts by date", error);
+      toast.error("Error getting submission counts by date");
+    }
+  },
+
+
 
 }));

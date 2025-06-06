@@ -12,6 +12,7 @@ import AdminRoute from './components/AdminRoute'
 import AddProblem from './pages/AddProblem'
 import ProblemPage from './pages/ProblemPage'
 import ProfilePage from './pages/ProfilePage'
+import AllSubmissionPage from './pages/AllSubmissionPage'
 
 
 const App = () => {
@@ -66,6 +67,10 @@ const App = () => {
 <Route
   path='/profile'
   element={authUser ? <ProfilePage /> : <Navigate to='/login' />}
+/>
+<Route
+  path='/allSubmissions'
+  element={authUser ? <AllSubmissionPage /> : <Navigate to='/login' />}
 />
 
 

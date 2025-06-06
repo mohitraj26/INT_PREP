@@ -1,5 +1,7 @@
+
 @import "tailwindcss";
 @plugin "daisyui";
+
 
 /* global.css or index.css */
 html, body {
@@ -60,3 +62,37 @@ html, body {
   .navbar{
     min-height: 3.4rem;
   }
+
+  .react-calendar-heatmap {
+    background: #1a1a1a; /* dark background */
+  }
+  .react-calendar-heatmap .color-empty {
+    fill: #2d333b; /* dark cell for no activity */
+  }
+  .react-calendar-heatmap .color-scale-1 {
+    fill: #264653;
+  }
+  .react-calendar-heatmap .color-scale-2 {
+    fill: #2a9d8f;
+  }
+  .react-calendar-heatmap .color-scale-3 {
+    fill: #e9c46a;
+  }
+  .react-calendar-heatmap .color-scale-4 {
+    fill: #f4a261;
+  }
+  .react-calendar-heatmap text {
+    fill: #c9d1d9; /* light text for month and weekday labels */
+  }
+
+  .dark-mode .react-calendar-heatmap {
+  background: #181a1b;
+}
+
+.dark-mode .react-calendar-heatmap .color-empty { fill: #23272f; }
+.dark-mode .react-calendar-heatmap .color-scale-1 { fill: #f4a261; }  /* orange like your screenshot */
+.dark-mode .react-calendar-heatmap .color-scale-2 { fill: #2a9d8f; }  /* teal like your screenshot */
+/* Add more color scales if you have more levels */
+
+.dark-mode .react-calendar-heatmap text { fill: #c9d1d9; } /* light text for labels */
+

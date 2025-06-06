@@ -1,14 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useProblemStore } from '../store/useProblemStore';
 import { Link } from 'react-router-dom';
 import { Tag, ExternalLink, AlertTriangle, CheckCircle, Circle } from 'lucide-react';
+import ContributionGraph from "../components/ContributionGraph";
+import PlaylistProfile from './PlaylistProfile';
 
 const ProblemSolvedByUser = () => {
   const { getProblemSolvedByUser, solvedProblems } = useProblemStore();
+  const [currentPage, setCurrentPage] = useState(1);
+  const submissionsPerPage = 5;
 
   useEffect(() => {
     getProblemSolvedByUser();
-  }, [getProblemSolvedByUser]);
+  }, []);
+
+  useEffect(() => {
+  setCurrentPage(1);
+}, [solvedProblems]);
+
+
+    //  Pagination logic
+  const indexOfLastSubmission = currentPage * submissionsPerPage;
+  const indexOfFirstSubmission = indexOfLastSubmission - submissionsPerPage;
+  const currentSubmissions = solvedProblems.slice(indexOfFirstSubmission, indexOfLastSubmission);
+  const totalPages = Math.ceil(solvedProblems.length / submissionsPerPage);
 
   // Function to get difficulty badge styling
   const getDifficultyBadge = (difficulty) => {
@@ -48,6 +63,33 @@ const ProblemSolvedByUser = () => {
       <div className="max-w-4xl mx-auto">
         <h2 className="text-2xl font-bold text-primary mb-6">Problems Solved</h2>
         
+
+                {/* Stats Cards */}
+        {solvedProblems.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="stat bg-base-100 shadow rounded-box ">
+              <div className="stat-title flex justify-center items-center text-lg">Easy</div>
+              <div className="stat-value text-success flex justify-center items-center">
+                {solvedProblems.filter(p => p.difficulty === 'EASY').length}
+              </div>
+            </div>
+            <div className="stat bg-base-100 shadow rounded-box">
+              <div className="stat-title flex justify-center items-center text-lg">Medium</div>
+              <div className="stat-value text-warning flex justify-center items-center">
+                {solvedProblems.filter(p => p.difficulty === 'MEDIUM').length}
+              </div>
+            </div>
+            <div className="stat bg-base-100 shadow rounded-box">
+              <div className="stat-title flex justify-center items-center text-lg">Hard</div>
+              <div className="stat-value text-error flex justify-center items-center">
+                {solvedProblems.filter(p => p.difficulty === 'HARD').length}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <ContributionGraph />
+
         {solvedProblems.length === 0 ? (
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
@@ -63,7 +105,7 @@ const ProblemSolvedByUser = () => {
         ) : (
           <div className="card bg-base-100 shadow-xl overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="table table-zebra w-full">
+              <table className="table table-zebra ">
                 <thead>
                   <tr>
                     <th className="bg-base-300">Problem</th>
@@ -73,7 +115,7 @@ const ProblemSolvedByUser = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {solvedProblems.map((problem) => (
+                  {currentSubmissions.map((problem) => (
                     <tr key={problem.id} className="hover">
                       <td className="font-medium">{problem.title}</td>
                       <td>{getDifficultyBadge(problem.difficulty)}</td>
@@ -90,7 +132,7 @@ const ProblemSolvedByUser = () => {
                       <td className="text-center">
                         <div className="flex justify-center">
                           <Link 
-                            to={`/problems/${problem.id}`} 
+                            to={`/problem/${problem.id}`} 
                             className="btn btn-sm btn-outline btn-primary"
                           >
                             <ExternalLink size={14} className="mr-1" />
@@ -109,37 +151,49 @@ const ProblemSolvedByUser = () => {
                 <span className="text-sm">
                   Total problems solved: <span className="font-bold">{solvedProblems.length}</span>
                 </span>
-                <Link to="/problems" className="btn btn-sm btn-primary">
-                  Solve more problems
+
+                                    {/* Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center mt-6 gap-2">
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <button
+                        key={i + 1}
+                        className={`btn ${currentPage === i + 1 ? 'btn-primary' : 'btn-outline'}`}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                    <button
+                      className="btn btn-outline"
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+
+                <Link to="/allSubmissions" className="btn btn-sm btn-primary items-center">
+                  View all submissions
                 </Link>
               </div>
             </div>
           </div>
         )}
+
+
+
+        <PlaylistProfile/>
         
-        {/* Stats Cards */}
-        {solvedProblems.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="stat bg-base-100 shadow rounded-box">
-              <div className="stat-title">Easy</div>
-              <div className="stat-value text-success">
-                {solvedProblems.filter(p => p.difficulty === 'EASY').length}
-              </div>
-            </div>
-            <div className="stat bg-base-100 shadow rounded-box">
-              <div className="stat-title">Medium</div>
-              <div className="stat-value text-warning">
-                {solvedProblems.filter(p => p.difficulty === 'MEDIUM').length}
-              </div>
-            </div>
-            <div className="stat bg-base-100 shadow rounded-box">
-              <div className="stat-title">Hard</div>
-              <div className="stat-value text-error">
-                {solvedProblems.filter(p => p.difficulty === 'HARD').length}
-              </div>
-            </div>
-          </div>
-        )}
+
       </div>
     </div>
   );

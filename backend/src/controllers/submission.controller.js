@@ -103,3 +103,39 @@ export const getSubmissionById = async (req, res) => {
     });
   }
 };
+
+export const getSubmissionCountsByDate = async (req, res) => {
+  try {
+    const userId = req.user.id; // Optional: filter by user
+
+    const submissions = await db.submission.groupBy({
+      by: ['createdAt'],
+      _count: {
+        id: true,
+      },
+      where: {
+        userId: userId, // Remove if you want counts for all users
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    // Format the result to { date: 'YYYY-MM-DD', count: N }
+    const values = submissions.map((item) => ({
+      date: item.createdAt.toISOString().slice(0, 10), // Get 'YYYY-MM-DD'
+      count: item._count.id,
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: "Submission counts fetched successfully",
+      values,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: "Error while fetching submission counts by date",
+    });
+  }
+};
