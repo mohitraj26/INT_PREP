@@ -288,10 +288,13 @@ const handleSubmitCode = async (e) => {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Link to="/" className="btn btn-ghost btn-circle">
+          <Link to="/homepage" className="btn btn-ghost btn-circle">
             <Home className="w-5 h-5" />
           </Link>
-          <h1 className="text-xl font-bold hidden md:block">CodeRunner</h1>
+          <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
+              <Code2 className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-xl font-bold hidden md:block">INT_PREP</h1>
         </div>
 
         <div className="flex gap-2">

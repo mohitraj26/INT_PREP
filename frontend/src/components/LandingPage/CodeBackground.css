@@ -1,0 +1,139 @@
+.code-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.code-element {
+  position: absolute;
+  color: rgba(139, 92, 246, 0.15); /* Purple with low opacity */
+  font-family: "Courier New", monospace;
+  white-space: nowrap;
+  animation: float-and-fade 15s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+  text-shadow: 0 0 5px rgba(139, 92, 246, 0.3);
+}
+
+@keyframes float-and-fade {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50px);
+    opacity: 0;
+  }
+}
+
+/* Add a typing animation for some elements */
+.code-element:nth-child(3n) {
+  width: 0;
+  overflow: hidden;
+  animation: typing 8s steps(40, end) infinite, float-and-fade 15s linear infinite;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  50% {
+    width: 100%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Add a blinking cursor effect for some elements */
+.code-element:nth-child(3n)::after {
+  content: "|";
+  animation: blink-caret 0.75s step-end infinite;
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Make some elements move in different directions */
+.code-element:nth-child(2n) {
+  animation: float-right 20s linear infinite;
+}
+
+.code-element:nth-child(4n) {
+  animation: float-diagonal 25s linear infinite;
+}
+
+@keyframes float-right {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+}
+
+@keyframes float-diagonal {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px);
+    opacity: 0;
+  }
+}
+
+/* Add a matrix-like effect for symbols */
+.code-element:nth-child(5n) {
+  color: rgba(74, 222, 128, 0.2); /* Green with low opacity */
+  animation: matrix-fall 15s linear infinite;
+}
+
+@keyframes matrix-fall {
+  0% {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}

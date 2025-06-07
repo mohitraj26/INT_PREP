@@ -13,6 +13,7 @@ import AddProblem from './pages/AddProblem'
 import ProblemPage from './pages/ProblemPage'
 import ProfilePage from './pages/ProfilePage'
 import AllSubmissionPage from './pages/AllSubmissionPage'
+import LandingPage from './pages/LandingPage'
 
 
 const App = () => {
@@ -33,22 +34,27 @@ const App = () => {
     <div className='flex flex-col items-center justify-center'>
       <Toaster />
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/homepage" element={<Layout />}>
           <Route
             index
             element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
           />
         </Route>
 
+        <Route
+          path='/'
+          element={<LandingPage />}
+        ></Route>
+
 
         <Route
           path='/login'
-          element={!authUser ? <LoginPage /> : <Navigate to='/' />}
+          element={!authUser ? <LoginPage /> : <Navigate to='/homepage' />}
         ></Route>
 
         <Route
           path='/signup'
-          element={!authUser ? <SignupPage /> : <Navigate to='/' />}
+          element={!authUser ? <SignupPage /> : <Navigate to='/homepage' />}
         ></Route>
 
         <Route
@@ -64,15 +70,15 @@ const App = () => {
 
         </Route>
 
-<Route
-  path='/profile'
-  element={authUser ? <ProfilePage /> : <Navigate to='/login' />}
-/>
-<Route
-  path='/allSubmissions'
-  element={authUser ? <AllSubmissionPage /> : <Navigate to='/login' />}
-/>
+        <Route
+          path='/profile'
+          element={authUser ? <ProfilePage /> : <Navigate to='/login' />}
+        />
 
+        <Route
+          path='/allSubmissions'
+          element={authUser ? <AllSubmissionPage /> : <Navigate to='/login' />}
+        />
 
       </Routes>
     </div>

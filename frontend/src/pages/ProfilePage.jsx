@@ -86,7 +86,7 @@ const ProfilePage = () => {
       {/* Header with back button */}
       <div className="flex flex-row justify-between items-center w-full mb-3">
         <div className="flex items-center gap-3">
-          <Link to={"/"} className="btn btn-circle btn-ghost">
+          <Link to={"/homepage"} className="btn btn-circle btn-ghost">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className="text-3xl font-bold text-primary">Profile</h1>
