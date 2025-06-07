@@ -988,54 +988,54 @@ class Solution {
   },
   
   // 4. Binary Tree Level Order Traversal (Tree Problem)
-  {
-    id: "binary-tree-level-order-traversal",
-    title: "Binary Tree Level Order Traversal",
-    category: "tree",
-    description:
-      "Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).",
-    difficulty: "MEDIUM",
-    tags: ["Tree", "Binary Tree", "Breadth-First Search", "BFS"],
-    constraints:
-      "The number of nodes in the tree is in the range [0, 2000].\n-1000 <= Node.val <= 1000",
-    hints:
-      "Try using a queue data structure for a breadth-first search (BFS) approach.",
-    editorial:
-      "Level-order traversal requires us to process nodes level by level, which is perfectly suited for a breadth-first search approach. We use a queue to store nodes at each level and process them from left to right.",
-    testCases: [
-      {
-        input: "[3,9,20,null,null,15,7]",
-        output: "[[3],[9,20],[15,7]]",
-      
-      },
-      {
-        input: "[1]",
-        output: "[[1]]",
-      },
-      {
-        input: "[]",
-        output: "[]",
-      },
-    ],
-    examples: {
-      JAVASCRIPT: {
-        input: "root = [3,9,20,null,null,15,7]",
-        output: "[[3],[9,20],[15,7]]",
-        explanation: "The level order traversal gives us three levels:\n- Level 1: [3]\n- Level 2: [9,20]\n- Level 3: [15,7]",
-      },
-      PYTHON: {
-        input: "root = [3,9,20,null,null,15,7]",
-        output: "[[3],[9,20],[15,7]]",
-        explanation: "The level order traversal gives us three levels:\n- Level 1: [3]\n- Level 2: [9,20]\n- Level 3: [15,7]",
-      },
-      JAVA: {
-        input: "root = [3,9,20,null,null,15,7]",
-        output: "[[3],[9,20],[15,7]]",
-        explanation: "The level order traversal gives us three levels:\n- Level 1: [3]\n- Level 2: [9,20]\n- Level 3: [15,7]",
-      },
+{
+  id: "binary-tree-level-order-traversal",
+  title: "Binary Tree Level Order Traversal",
+  category: "tree",
+  description:
+    "Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).",
+  difficulty: "MEDIUM",
+  tags: ["Tree", "Binary Tree", "Breadth-First Search", "BFS"],
+  constraints:
+    "The number of nodes in the tree is in the range [0, 2000].\n-1000 <= Node.val <= 1000",
+  hints:
+    "Try using a queue data structure for a breadth-first search (BFS) approach.",
+  editorial:
+    "Level-order traversal requires us to process nodes level by level, which is perfectly suited for a breadth-first search approach. We use a queue to store nodes at each level and process them from left to right.",
+  testCases: [
+    {
+      input: "[3,9,20,null,null,15,7]",
+      output: "[[3],[9,20],[15,7]]",
+    
     },
-    codeSnippets: {
-      JAVASCRIPT: `/**
+    {
+      input: "[1]",
+      output: "[[1]]",
+    },
+    {
+      input: "[]",
+      output: "[]",
+    },
+  ],
+  examples: {
+    JAVASCRIPT: {
+      input: "root = [3,9,20,null,null,15,7]",
+      output: "[[3],[9,20],[15,7]]",
+      explanation: "The level order traversal gives us three levels:\n- Level 1: [3]\n- Level 2: [9,20]\n- Level 3: [15,7]",
+    },
+    PYTHON: {
+      input: "root = [3,9,20,null,null,15,7]",
+      output: "[[3],[9,20],[15,7]]",
+      explanation: "The level order traversal gives us three levels:\n- Level 1: [3]\n- Level 2: [9,20]\n- Level 3: [15,7]",
+    },
+    JAVA: {
+      input: "root = [3,9,20,null,null,15,7]",
+      output: "[[3],[9,20],[15,7]]",
+      explanation: "The level order traversal gives us three levels:\n- Level 1: [3]\n- Level 2: [9,20]\n- Level 3: [15,7]",
+    },
+  },
+codeSnippets: {
+  JAVASCRIPT: `/**
  * Definition for a binary tree node.
  * function TreeNode(val, left, right) {
  *     this.val = (val===undefined ? 0 : val)
