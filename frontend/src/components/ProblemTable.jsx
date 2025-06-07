@@ -5,7 +5,7 @@ import { Bookmark, PencilIcon, Trash, TrashIcon, Plus, Loader2 } from "lucide-re
 import { useAction } from '../store/useAction';
 import { usePlaylistStore } from '../store/usePlaylistStore';
 import CreatePlaylistModal from './CreatePlaylistModal';
-import AddToPlaylist from './AddToPlayList';
+import AddToPlaylist from './AddToPlaylist';
 import { set } from 'react-hook-form';
 
 function CompanyTagSelect({ allCompanyTags, selectedCompany, setSelectedCompany }) {
