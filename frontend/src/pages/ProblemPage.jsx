@@ -138,6 +138,34 @@ const handleSubmitCode = async (e) => {
     setShowDescription(!showDescription);
   };
 
+const companyColors = {
+  Amazon: "badge-warning",
+  Google: "badge-success",
+  Facebook: "badge-primary",
+  Microsoft: "badge-info",
+  Flipkart: "badge-secondary",
+  // Add more companies and colors as needed
+};
+
+function CompanyBadges({ companies }) {
+  return (
+    <div className="flex gap-2 flex-wrap">
+      {companies.map((company) => (
+        <div
+          key={company}
+          className={`badge badge-outline ${companyColors[company] || "badge-accent"}`}
+        >
+          {company}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Usage
+// <CompanyBadges companies={problem.companyTag} />
+
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "description":
@@ -175,7 +203,9 @@ const handleSubmitCode = async (e) => {
                 </button>
               </div>
             </div>
+            
 
+            <CompanyBadges companies={problem.companyTag} />       
             <p className="text-lg mb-6 mt-7">{problem.description}</p>
 
             {problem.examples && (

@@ -46,6 +46,7 @@ model Problem {
   title       String
   description String
   difficulty  Difficulty
+  companyTag  String[]
   tags        String[] // ["tag1", "tag2", "tag3"]
   userId      String
   examples    Json
