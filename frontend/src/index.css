@@ -96,7 +96,6 @@ html, body {
 
 .dark-mode .react-calendar-heatmap text { fill: #c9d1d9; } /* light text for labels */
 
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
     "Droid Sans", "Helvetica Neue", sans-serif;

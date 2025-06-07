@@ -27,7 +27,9 @@ function ContributionGraph() {
     }, {})
   );
 
-
+  const endDate = new Date();
+  const startDate = new Date();
+  startDate.setFullYear(startDate.getFullYear() - 1);
 
   return (
     <div className={isDarkMode ? 'dark-mode' : ''} style={{ padding: 20 }}>
@@ -35,8 +37,8 @@ function ContributionGraph() {
         Switch to {isDarkMode ? 'Light' : 'Dark'} Mode
       </button> */}
       <CalendarHeatmap
-        startDate={new Date('2024-06-08')}
-        endDate={new Date('2025-06-08')}
+        startDate={startDate}
+        endDate={endDate}
         values={aggregated}
         classForValue={value => {
           if (!value) return 'color-empty';
