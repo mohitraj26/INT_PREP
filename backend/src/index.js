@@ -12,10 +12,12 @@ import playlistRoutes from "./routes/playlist.route.js";
 dotenv.config();
 const app = express();
 
+app.set('trust proxy', 1); // trust Render’s proxy for HTTPS
 app.use(cors({
     origin: "https://int-prep.onrender.com",
     credentials: true
 }))
+app.options('*', cors());
 
 app. use(express.json());
 app.use(cookieParser());
