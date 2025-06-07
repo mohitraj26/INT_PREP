@@ -133,24 +133,24 @@ exports.Prisma.ProblemScalarFieldEnum = {
   title: 'title',
   description: 'description',
   difficulty: 'difficulty',
-  companyTag: 'companyTag',
   tags: 'tags',
   userId: 'userId',
   examples: 'examples',
   constraints: 'constraints',
-  hints: 'hints',
   editorial: 'editorial',
-  testcases: 'testcases',
   codeSnippets: 'codeSnippets',
   referenceSolutions: 'referenceSolutions',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  testcases: 'testcases',
+  hints: 'hints',
+  companyTag: 'companyTag'
 };
 
 exports.Prisma.SubmissionScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
   problemId: 'problemId',
+  userId: 'userId',
   sourceCode: 'sourceCode',
   language: 'language',
   stdin: 'stdin',
