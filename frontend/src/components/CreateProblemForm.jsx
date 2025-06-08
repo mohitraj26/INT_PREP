@@ -737,7 +737,7 @@ const CreateProblemForm = () => {
                     <input
                       type="text"
                       className="input input-bordered flex-1"
-                      {...register(`companyTags.${index}`)}
+                      {...register(`companyTag.${index}`)}
                       placeholder="Enter company tag"
                     />
                     <button
