@@ -25,6 +25,7 @@ const problemSchema = z.object({
   tags: z.array(z.string()).min(1, "At least one tag is required"),
   constraints: z.string().min(1, "Constraints are required"),
   hints: z.string().optional(),
+  companyTag: z.array(z.string()).optional(),
   editorial: z.string().optional(),
   testcases: z
     .array(
@@ -520,6 +521,7 @@ const CreateProblemForm = () => {
             defaultValues:{
                  testcases: [{ input: "", output: "" }],
       tags: [""],
+      companyTag: [""],
       examples: {
         JAVASCRIPT: { input: "", output: "", explanation: "" },
         PYTHON: { input: "", output: "", explanation: "" },
@@ -558,6 +560,17 @@ const CreateProblemForm = () => {
     control,
     name: "tags",
   });
+
+  const {
+    fields: companyTagFields,
+    append: appendCompanyTag,
+    remove: removeCompanyTag,
+    replace: replaceCompanyTags,
+  } = useFieldArray({
+    control,
+    name: "companyTags",
+  });
+
 
   const [isLoading , setIsLoading] = useState(false);
 
@@ -698,6 +711,50 @@ const CreateProblemForm = () => {
                   </label>
                 )}
               </div>
+            </div>
+
+            {/* Company Tags */}
+            <div className="card bg-base-200 p-4 md:p-6 shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
+                  <Building2 className="w-5 h-5" />
+                  Company Tags
+                </h3>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => appendCompanyTag("")}
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Add Company Tag
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {companyTagFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      className="input input-bordered flex-1"
+                      {...register(`companyTags.${index}`)}
+                      placeholder="Enter company tag"
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-square btn-sm"
+                      onClick={() => removeCompanyTag(index)}
+                      disabled={companyTagFields.length === 1}
+                    >
+                      <Trash2 className="w-4 h-4 text-error" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {errors.companyTag && (
+                <div className="mt-2">
+                  <span className="text-error text-sm">
+                    {errors.companyTag.message}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Tags */}
