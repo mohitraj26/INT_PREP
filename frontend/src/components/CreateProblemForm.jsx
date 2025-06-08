@@ -11,6 +11,7 @@ import {
   BookOpen,
   CheckCircle2,
   Download,
+  Building2
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { useState } from 'react';
