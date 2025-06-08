@@ -598,7 +598,7 @@ const CreateProblemForm = () => {
     const sampleData = sampleType === "DP" ? sampledpData : sampleStringProblem;
     console.log("Loading sample data:", sampleData);
 
-    replaceCompanyTags(sampleData.companyTags.map((tag) => tag));
+    replaceCompanyTags(sampleData.companyTag.map((tag) => tag));
     replaceTags(sampleData.tags.map((tag) => tag));
     replacetestcases(sampleData.testcases.map((tc) => tc));
 
