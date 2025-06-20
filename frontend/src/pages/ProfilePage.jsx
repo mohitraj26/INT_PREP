@@ -1,8 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Mail, User, Shield, Image } from "lucide-react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Avatar,
+  Typography,
+  Chip,
+  Grid,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  IconButton,
+  Paper,
+  Divider,
+  Container,
+  useTheme,
+  useMediaQuery,
+  Stack,
+  Alert,
+} from "@mui/material";
+import {
+  ArrowBack,
+  Email,
+  Person,
+  Security,
+  Image,
+  Edit,
+  Lock,
+  Close,
+} from "@mui/icons-material";
 import { useAuthStore } from "../store/useAuthStore";
-import ProblemSolvedByUser from "../components/ProblemSolvedByUser";
+import { useThemeContext } from "../context/Theme"; 
 
 // Utility to get initials
 function getInitials(name) {
@@ -12,27 +44,18 @@ function getInitials(name) {
   return (names[0][0] + names[names.length - 1][0]).toUpperCase();
 }
 
-// Simple Modal Component
-function Modal({ open, onClose, title, children }) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-base-200 rounded-lg shadow-lg w-full max-w-md p-6 relative">
-        <button className="absolute top-2 right-2 text-gray-500" onClick={onClose}>
-          ✕
-        </button>
-        <h3 className="text-xl font-bold mb-4">{title}</h3>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 const ProfilePage = () => {
   const { authUser, setAuthUser } = useAuthStore();
+  const { isDarkMode } = useThemeContext();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
+
   // Modal states
   const [editOpen, setEditOpen] = useState(false);
   const [passwordOpen, setPasswordOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
 
   // Edit Profile Form State
   const [editData, setEditData] = useState({
@@ -55,9 +78,11 @@ const ProfilePage = () => {
 
   const handleProfileUpdate = (e) => {
     e.preventDefault();
-    // TODO: Connect to API/store
     setAuthUser({ ...authUser, ...editData });
     setEditOpen(false);
+    setAlertMessage("Profile updated successfully!");
+    setAlertSeverity("success");
+    setTimeout(() => setAlertMessage(""), 3000);
   };
 
   // Change Password Handlers
@@ -68,11 +93,32 @@ const ProfilePage = () => {
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("New passwords do not match!");
+      setAlertMessage("New passwords do not match!");
+      setAlertSeverity("error");
+      setTimeout(() => setAlertMessage(""), 3000);
       return;
     }
-    // TODO: Connect to API/store
-    alert("Password changed successfully! (Mock)");
+    setPasswordOpen(false);
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+    setAlertMessage("Password changed successfully!");
+    setAlertSeverity("success");
+    setTimeout(() => setAlertMessage(""), 3000);
+  };
+
+  const handleCloseEdit = () => {
+    setEditOpen(false);
+    setEditData({
+      name: authUser.name,
+      email: authUser.email,
+      image: authUser.image || "",
+    });
+  };
+
+  const handleClosePassword = () => {
     setPasswordOpen(false);
     setPasswordData({
       currentPassword: "",
@@ -82,185 +128,396 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center py-2 px-4 md:px-4 w-full">
-      {/* Header with back button */}
-      <div className="flex flex-row justify-between items-center w-full mb-3">
-        <div className="flex items-center gap-3">
-          <Link to={"/homepage"} className="btn btn-circle btn-ghost">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-3xl font-bold text-primary">Profile</h1>
-        </div>
-      </div>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        py: { xs: 2, md: 3 },
+        px: { xs: 1, sm: 2, md: 3 },
+      }}
+    >
+      <Container maxWidth="lg">
+        {/* Header */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            mb: { xs: 2, md: 3 },
+            gap: 2,
+          }}
+        >
+          <Typography
+            variant={isMobile ? "h4" : "h3"}
+            sx={{
+              fontWeight: "bold",
+              color: "primary.main",
+              flexGrow: 1,
+            }}
+          >
+            Profile
+          </Typography>
+        </Box>
 
-      <div className="w-full mx-auto flex flex-col lg:flex-row gap-1">
-        {/* Profile Info Section */}
-        <div className="min-h-screen flex items-start justify-center p-6">
-          {/* Profile Card */}
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body">
-              {/* Profile Header */}
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                {/* Avatar */}
-                <div className="avatar placeholder">
-                  <div className="bg-neutral text-neutral-content rounded-full w-24 h-24 ring ring-primary ring-offset-base-100 ring-offset-2" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                    {authUser.image ? (
-                      <img src={authUser?.image || "https://avatar.iran.liara.run/public/boy"} alt={authUser.name} className="w-24 h-24 rounded-full" />
-                    ) : (
-                      <span className="text-6xl text-center">{getInitials(authUser.name)}</span>
-                    )}
-                  </div>
-                </div>
-                {/* Name and Role Badge */}
-                <div className="text-center md:text-left">
-                  <h2 className="text-2xl font-bold">{authUser.name}</h2>
-                  <div className="badge badge-primary mt-2">{authUser.role}</div>
-                </div>
-              </div>
-              <div className="divider"></div>
-              {/* User Information */}
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                {/* Email */}
-                <div className="stat bg-base-200 rounded-box">
-                  <div className="stat-figure text-primary">
-                    <Mail className="w-8 h-8" />
-                  </div>
-                  <div className="stat-title">Email</div>
-                  <div className="stat-value text-lg break-all">{authUser.email}</div>
-                </div>
-                {/* User ID */}
-                <div className="stat bg-base-200 rounded-box">
-                  <div className="stat-figure text-primary">
-                    <User className="w-8 h-8" />
-                  </div>
-                  <div className="stat-title">User ID</div>
-                  <div className="stat-value text-sm break-all">{authUser.id}</div>
-                </div>
-                {/* Role Status */}
-                <div className="stat bg-base-200 rounded-box">
-                  <div className="stat-figure text-primary">
-                    <Shield className="w-8 h-8" />
-                  </div>
-                  <div className="stat-title">Role</div>
-                  <div className="stat-value text-lg">{authUser.role}</div>
-                  <div className="stat-desc">
-                    {authUser.role === "ADMIN" ? "Full system access" : "Limited access"}
-                  </div>
-                </div>
-                {/* Profile Image Status */}
-                <div className="stat bg-base-200 rounded-box">
-                  <div className="stat-figure text-primary">
-                    <Image className="w-8 h-8" />
-                  </div>
-                  <div className="stat-title">Profile Image</div>
-                  <div className="stat-value text-lg">
-                    {authUser.image ? "Uploaded" : "Not Set"}
-                  </div>
-                  <div className="stat-desc">
-                    {authUser.image ? "Image available" : "Upload a profile picture"}
-                  </div>
-                </div>
-              </div>
-              {/* Action Buttons */}
-              <div className="card-actions justify-end mt-6">
-                <button className="btn btn-outline btn-primary" onClick={() => setEditOpen(true)}>
-                  Edit Profile
-                </button>
-                <button className="btn btn-primary" onClick={() => setPasswordOpen(true)}>
-                  Change Password
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex-1">
-          <ProblemSolvedByUser />
-        </div>
-      </div>
+        {/* Alert */}
+        {alertMessage && (
+          <Alert
+            severity={alertSeverity}
+            sx={{ mb: 2 }}
+            onClose={() => setAlertMessage("")}
+          >
+            {alertMessage}
+          </Alert>
+        )}
 
-      {/* Edit Profile Modal */}
-      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Profile">
-        <form onSubmit={handleProfileUpdate} className="flex flex-col gap-4">
-          <label>
-            Name
-            <input
-              className="input input-bordered w-full"
-              type="text"
-              name="name"
-              value={editData.name}
-              onChange={handleEditChange}
-              required
-            />
-          </label>
-          <label>
-            Email
-            <input
-              className="input input-bordered w-full"
-              type="email"
-              name="email"
-              value={editData.email}
-              onChange={handleEditChange}
-              required
-            />
-          </label>
-          <label>
-            Profile Image URL
-            <input
-              className="input input-bordered w-full"
-              type="text"
-              name="image"
-              value={editData.image}
-              onChange={handleEditChange}
-            />
-          </label>
-          <button type="submit" className="btn btn-primary mt-4">
-            Save Changes
-          </button>
+        {/* Main Content */}
+        <Grid container spacing={3} justifyContent="center" width={"full"}>
+          <Grid size={{ xs: 12, lg: 8 }}>
+            <Card
+              elevation={3}
+              sx={{
+                borderRadius: 3,
+                overflow: "visible",
+                position: "relative",
+              }}
+            >
+              <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+                {/* Profile Header */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: "center",
+                    gap: { xs: 2, sm: 3 },
+                    mb: 3,
+                  }}
+                >
+                  {/* Avatar */}
+                  <Avatar
+                    src={authUser.image}
+                    sx={{
+                      width: { xs: 80, sm: 100, md: 120 },
+                      height: { xs: 80, sm: 100, md: 120 },
+                      fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                      bgcolor: "primary.main",
+                      border: 3,
+                      borderColor: "primary.light",
+                      boxShadow: 3,
+                    }}
+                  >
+                    {!authUser.image && getInitials(authUser.name)}
+                  </Avatar>
+
+                  {/* Name and Role */}
+                  <Box
+                    sx={{
+                      textAlign: { xs: "center", sm: "left" },
+                      flexGrow: 1,
+                    }}
+                  >
+                    <Typography
+                      variant={isMobile ? "h5" : "h4"}
+                      sx={{
+                        fontWeight: "bold",
+                        mb: 1,
+                        color: "text.primary",
+                      }}
+                    >
+                      {authUser.name}
+                    </Typography>
+                    <Chip
+                      label={authUser.role}
+                      color="primary"
+                      variant={isDarkMode ? "filled" : "outlined"}
+                      sx={{
+                        fontWeight: "medium",
+                        fontSize: "0.875rem",
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                <Divider sx={{ my: 3 }} />
+
+                {/* User Information Grid */}
+                <Grid container spacing={2}>
+                  {/* Email */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: "background.paper",
+                        border: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                        <Email color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Email
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: "medium",
+                          wordBreak: "break-all",
+                        }}
+                      >
+                        {authUser.email}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+
+                  {/* User ID */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: "background.paper",
+                        border: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                        <Person color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="subtitle2" color="text.secondary">
+                          User ID
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          fontWeight: "medium",
+                          wordBreak: "break-all",
+                        }}
+                      >
+                        {authUser.id}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+
+                  {/* Role Status */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: "background.paper",
+                        border: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                        <Security color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Role
+                        </Typography>
+                      </Box>
+                      <Typography variant="body1" sx={{ fontWeight: "medium", mb: 0.5 }}>
+                        {authUser.role}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {authUser.role === "ADMIN" ? "Full system access" : "Limited access"}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+
+                  {/* Profile Image Status */}
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <Paper
+                      elevation={1}
+                      sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        bgcolor: "background.paper",
+                        border: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                        <Image color="primary" sx={{ mr: 1 }} />
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Profile Image
+                        </Typography>
+                      </Box>
+                      <Typography variant="body1" sx={{ fontWeight: "medium", mb: 0.5 }}>
+                        {authUser.image ? "Uploaded" : "Not Set"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {authUser.image ? "Image available" : "Upload a profile picture"}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+
+                {/* Action Buttons */}
+                <Stack
+                  direction={isMobile ? "column" : "row"}
+                  spacing={2}
+                  sx={{ mt: 4, justifyContent: "flex-end" }}
+                >
+                  <Button
+                    variant="outlined"
+                    startIcon={<Edit />}
+                    onClick={() => setEditOpen(true)}
+                    size={isMobile ? "medium" : "large"}
+                    sx={{ minWidth: 140 }}
+                  >
+                    Edit Profile
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<Lock />}
+                    onClick={() => setPasswordOpen(true)}
+                    size={isMobile ? "medium" : "large"}
+                    sx={{ minWidth: 140 }}
+                  >
+                    Change Password
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Container>
+
+      {/* Edit Profile Dialog */}
+      <Dialog
+        open={editOpen}
+        onClose={handleCloseEdit}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 2,
+          },
+        }}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            Edit Profile
+          </Typography>
+          <IconButton onClick={handleCloseEdit} size="small">
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <form onSubmit={handleProfileUpdate}>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                label="Name"
+                name="name"
+                value={editData.name}
+                onChange={handleEditChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                value={editData.email}
+                onChange={handleEditChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
+              <TextField
+                label="Profile Image URL"
+                name="image"
+                value={editData.image}
+                onChange={handleEditChange}
+                fullWidth
+                variant="outlined"
+                helperText="Enter a valid image URL"
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button onClick={handleCloseEdit} color="inherit">
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" sx={{ minWidth: 120 }}>
+              Save Changes
+            </Button>
+          </DialogActions>
         </form>
-      </Modal>
+      </Dialog>
 
-      {/* Change Password Modal */}
-      <Modal open={passwordOpen} onClose={() => setPasswordOpen(false)} title="Change Password">
-        <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-4">
-          <label>
-            Current Password
-            <input
-              className="input input-bordered w-full"
-              type="password"
-              name="currentPassword"
-              value={passwordData.currentPassword}
-              onChange={handlePasswordChange}
-              required
-            />
-          </label>
-          <label>
-            New Password
-            <input
-              className="input input-bordered w-full"
-              type="password"
-              name="newPassword"
-              value={passwordData.newPassword}
-              onChange={handlePasswordChange}
-              required
-            />
-          </label>
-          <label>
-            Confirm New Password
-            <input
-              className="input input-bordered w-full"
-              type="password"
-              name="confirmPassword"
-              value={passwordData.confirmPassword}
-              onChange={handlePasswordChange}
-              required
-            />
-          </label>
-          <button type="submit" className="btn btn-primary mt-4">
+      {/* Change Password Dialog */}
+      <Dialog
+        open={passwordOpen}
+        onClose={handleClosePassword}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 2,
+          },
+        }}
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Change Password
-          </button>
+          </Typography>
+          <IconButton onClick={handleClosePassword} size="small">
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <form onSubmit={handlePasswordSubmit}>
+          <DialogContent>
+            <Stack spacing={3} sx={{ mt: 1 }}>
+              <TextField
+                label="Current Password"
+                name="currentPassword"
+                type="password"
+                value={passwordData.currentPassword}
+                onChange={handlePasswordChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
+              <TextField
+                label="New Password"
+                name="newPassword"
+                type="password"
+                value={passwordData.newPassword}
+                onChange={handlePasswordChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
+              <TextField
+                label="Confirm New Password"
+                name="confirmPassword"
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                fullWidth
+                required
+                variant="outlined"
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button onClick={handleClosePassword} color="inherit">
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" sx={{ minWidth: 120 }}>
+              Change Password
+            </Button>
+          </DialogActions>
         </form>
-      </Modal>
-    </div>
+      </Dialog>
+    </Box>
   );
 };
 

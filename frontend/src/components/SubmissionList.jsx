@@ -59,7 +59,7 @@ const SubmissionList = ({ submissions, isLoading }) => {
       }
 
       setSelectedSubmission(submission);
-      console.log("Fetched submission:", submission); // Verify the data
+      // console.log("Fetched submission:", submission); // Verify the data
       
     } catch (error) {
       console.error("Error in handleViewClick:", error);
@@ -98,7 +98,7 @@ const SubmissionList = ({ submissions, isLoading }) => {
       {submissions.map((submission) => (
         <div
           key={submission.id}
-          className="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow rounded-lg"
+          className="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow rounded-lg min-h-screen"
         >
           <div className="card-body p-4">
             <div className="flex items-center justify-between">

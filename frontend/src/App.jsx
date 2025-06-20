@@ -14,7 +14,8 @@ import ProblemPage from './pages/ProblemPage'
 import ProfilePage from './pages/ProfilePage'
 import AllSubmissionPage from './pages/AllSubmissionPage'
 import LandingPage from './pages/LandingPage'
-
+import NewPage from './pages/NewPage'
+import { ThemeProvider } from './context/Theme'
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -30,56 +31,52 @@ const App = () => {
       </div>
     );
   }
+
   return (
     <div className='flex flex-col items-center justify-center'>
       <Toaster />
+
       <Routes>
-        <Route path="/homepage" element={<Layout />}>
-          <Route
-            index
-            element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
-          />
-        </Route>
-
-        <Route
-          path='/'
-          element={<LandingPage />}
-        ></Route>
-
-
-        <Route
-          path='/login'
-          element={!authUser ? <LoginPage /> : <Navigate to='/homepage' />}
-        ></Route>
-
-        <Route
-          path='/signup'
-          element={!authUser ? <SignupPage /> : <Navigate to='/homepage' />}
-        ></Route>
-
+        
         <Route
           path='/problem/:id'
           element={authUser ? <ProblemPage /> : <Navigate to='/login' />}
-        ></Route>
-
-        <Route element={<AdminRoute />}>
-          <Route
-            path='/add-problem'
-            element={authUser ? <AddProblem /> : <Navigate to='/' />}
-          />
-
-        </Route>
-
-        <Route
-          path='/profile'
-          element={authUser ? <ProfilePage /> : <Navigate to='/login' />}
         />
 
         <Route
           path='/allSubmissions'
           element={authUser ? <AllSubmissionPage /> : <Navigate to='/login' />}
         />
+        <Route path='/' element={<LandingPage />} />
+        <Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to='/newpage' />} />
+        <Route path='/signup' element={!authUser ? <SignupPage /> : <Navigate to='/login' />} />
 
+        {/* ✅ All other pages wrapped in ThemeProvider */}
+        <Route
+          path='*'
+          element={
+            <ThemeProvider>
+              <Routes>
+
+                <Route path='/newpage' element={<NewPage />} />
+
+
+                <Route element={<AdminRoute />}>
+                  <Route
+                    path='/add-problem'
+                    element={authUser ? <AddProblem /> : <Navigate to='/' />}
+                  />
+                </Route>
+
+                <Route
+                  path='/profile'
+                  element={authUser ? <ProfilePage /> : <Navigate to='/login' />}
+                />
+
+              </Routes>
+            </ThemeProvider>
+          }
+        />
       </Routes>
     </div>
   )

@@ -69,7 +69,7 @@ const ProfileSubmission = () => {
   const totalPages = Math.ceil(filteredSubmissions.length / submissionsPerPage);
 
   return (
-    <div className="w-full bg-base-200 p-4 md:p-8">
+    <div className="w-full min-h-screen bg-base-200 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-primary mb-4 md:mb-0">My Submissions</h1>

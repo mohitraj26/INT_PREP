@@ -25,7 +25,7 @@ export const createProblem = async (req, res) => {
     for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
       const languageId = getJudge0LanguageId(language);
 
-      console.log("languageId", languageId);
+      // console.log("languageId", languageId);
 
       if (!languageId) {
         return res
@@ -190,7 +190,7 @@ export const updateProblem = async(req , res)=>{
     for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
       const languageId = getJudge0LanguageId(language);
 
-      console.log("languageId", languageId);
+      // console.log("languageId", languageId);
 
       if (!languageId) {
         return res
@@ -214,7 +214,7 @@ export const updateProblem = async(req , res)=>{
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
-        console.log("Result-----", result);
+        // console.log("Result-----", result);
         // console.log(
         //   `Testcase ${i + 1} and Language ${language} ----- result ${JSON.stringify(result.status.description)}`
         // );

@@ -22,7 +22,7 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              to={authUser ? '/homepage' : '/login'}
+              to={authUser ? '/newpage' : '/login'}
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 text-lg transition-all duration-300 hover:scale-105 rounded-md flex items-center glow-box"
             >
               Start Practicing

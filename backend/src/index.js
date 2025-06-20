@@ -15,6 +15,7 @@ const app = express();
 app.set('trust proxy', 1); // trust Render’s proxy for HTTPS
 app.use(cors({
     origin: "https://int-prep-frontend.onrender.com",
+    // origin: "http://localhost:5173",
     credentials: true
 }))
 

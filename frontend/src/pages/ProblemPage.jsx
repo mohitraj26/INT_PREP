@@ -87,7 +87,7 @@ const ProblemPage = () => {
       const expected_output = problem.testcases.map(tc => tc.output);
 
       const executionResults = await runCode(code, language_id, stdin, expected_output, id);
-      console.log(executionResults);
+      // console.log(executionResults);
       setExecutionResults(executionResults);
       setIsTestCasePanelOpen(true);
 
@@ -318,7 +318,7 @@ function CompanyBadges({ companies }) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <Link to="/homepage" className="btn btn-ghost btn-circle">
+          <Link to="/newpage" className="btn btn-ghost btn-circle">
             <Home className="w-5 h-5" />
           </Link>
           <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center">
@@ -371,23 +371,24 @@ function CompanyBadges({ companies }) {
             </li>
             <li>
               <Link to="/profile" className="hover:bg-primary hover:text-white">
-                <User className="w-4 h-4 mr-2" />
-                My Profile
+                <User className="w-5 h-5 mr-2" />
+                <p className='text-sm'>Profile</p>
               </Link>
             </li>
             {authUser?.role === "ADMIN" && (
               <li>
                 <Link to="/add-problem" className="hover:bg-primary hover:text-white">
-                  <Code className="w-4 h-4 mr-1" />
-                  Add Problem
+                  <Code className="w-5 h-5 mr-1" />
+                  <p className='text-sm'>Add Problem</p>
                 </Link>
               </li>
             )}
             <li>
-              <LogoutButton className="hover:bg-primary hover:text-white">
+              {/* <LogoutButton className="hover:bg-primary hover:text-white">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
-              </LogoutButton>
+              </LogoutButton> */}
+              <LogoutButton />
             </li>
           </ul>
         </div>

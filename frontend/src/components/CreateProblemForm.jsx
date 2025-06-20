@@ -1,23 +1,43 @@
-import React from 'react'
+import React, { useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {z} from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
-  Plus,
-  Trash2,
-  Code2,
-  FileText,
-  Lightbulb,
-  BookOpen,
-  CheckCircle2,
-  Download,
-  Building2
-} from "lucide-react";
+  Tabs, 
+  Tab, 
+  Box, 
+  Button, 
+  Typography, 
+  TextField, 
+  MenuItem, 
+  IconButton, 
+  Paper, 
+  Grid,
+  Chip,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  FormHelperText,
+  Divider
+} from "@mui/material";
+import { 
+  Add as AddIcon, 
+  Delete as DeleteIcon,
+  Code as CodeIcon,
+  Description as DescriptionIcon,
+  Lightbulb as LightbulbIcon,
+  MenuBook as MenuBookIcon,
+  CheckCircle as CheckCircleIcon,
+  Business as BusinessIcon
+} from "@mui/icons-material";
 import Editor from "@monaco-editor/react";
-import { useState } from 'react';
-import {axiosInstance} from "../lib/axios"
+import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useThemeContext } from "../context/Theme";
+
+
 
 const problemSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -64,7 +84,6 @@ const problemSchema = z.object({
     JAVA: z.string().min(1, "Java solution is required"),
   }),
 });
-
 
 const sampledpData = {
   title: "Climbing Stairs",
@@ -313,7 +332,6 @@ class Main {
   },
 };
 
-
 const sampleStringProblem = {
   title: "Valid Palindrome",
   description:
@@ -515,14 +533,26 @@ public class Main {
   },
 };
 
+function TabPanel({ children, value, index }) {
+  return (
+    <div hidden={value !== index} style={{ padding: 24 }}>
+      {value === index && <Box>{children}</Box>}
+    </div>
+  );
+}
+
 const CreateProblemForm = () => {
-    const [sampleType , setSampleType] = useState("DP")
-    const navigation = useNavigate();
-    const {register , control , handleSubmit , reset , formState:{errors}} = useForm(
-        {
-            resolver:zodResolver(problemSchema),
-            defaultValues:{
-                 testcases: [{ input: "", output: "" }],
+  const [tab, setTab] = useState(0);
+  const [sampleType, setSampleType] = useState("DP");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigate();
+
+  const { isDarkMode } = useThemeContext();
+
+  const { register, control, handleSubmit, watch, reset, formState: { errors } } = useForm({
+    resolver: zodResolver(problemSchema),
+    defaultValues: {
+      testcases: [{ input: "", output: "" }],
       tags: [""],
       companyTag: [""],
       examples: {
@@ -540,9 +570,8 @@ const CreateProblemForm = () => {
         PYTHON: "# Add your reference solution here",
         JAVA: "// Add your reference solution here",
       },
-            }
-        }
-    )
+    }
+  });
 
   const {
     fields: testCaseFields,
@@ -574,546 +603,592 @@ const CreateProblemForm = () => {
     name: "companyTag",
   });
 
-
-  const [isLoading , setIsLoading] = useState(false);
-
-  const onSubmit = async (value)=>{
-   try {
-    setIsLoading(true)
-    const res = await axiosInstance.post("/problem/create-problem" , value)
-    console.log(res.data);
-    toast.success(res.data.message || "Problem Created successfully");
-    navigation("/homepage");
-
-   } catch (error) {
-    console.log(error);
-    toast.error("Error creating problem")
-   }
-   finally{
+  const onSubmit = async (value) => {
+    try {
+      setIsLoading(true);
+      const res = await axiosInstance.post("/problem/create-problem", value);
+      // console.log(res.data);
+      toast.success(res.data.message || "Problem Created successfully");
+      navigation("/newpage");
+    } catch (error) {
+      console.log(error);
+      toast.error("Error creating problem");
+    } finally {
       setIsLoading(false);
-   }
-  }
+    }
+  };
 
-  const loadSampleData=()=>{
+
+  const loadSampleData = () => {
     const sampleData = sampleType === "DP" ? sampledpData : sampleStringProblem;
-    console.log("Loading sample data:", sampleData);
+    // console.log("Loading sample data:", sampleData);
 
     replaceCompanyTags(sampleData.companyTag.map((tag) => tag));
     replaceTags(sampleData.tags.map((tag) => tag));
     replacetestcases(sampleData.testcases.map((tc) => tc));
 
-   // Reset the form with sample data
+    // Reset the form with sample data
     reset(sampleData);
-  }
+  };
+
+  // Get the theme for Monaco editor
+  const getMonacoTheme = () => {
+    return isDarkMode ? 'vs-dark' : 'vs';
+  };
+
 
   return (
-    <div className='container mx-auto py-8 px-4 max-w-7xl'>
-  <div className="card bg-base-100 shadow-xl">
-        <div className="card-body p-6 md:p-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 pb-4 border-b">
-            <h2 className="card-title text-2xl md:text-3xl flex items-center gap-3">
-              <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-              Create Problem
-            </h2>
+  <Box sx={{ maxWidth: 1200, mx: "auto", my: 4, p: 3 }}>
+    <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>Create New Problem</Typography>
+      <Box sx={{ mb: 2, display: 'flex', gap: 2 }}>
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel>Sample Type</InputLabel>
+          <Select
+            value={sampleType}
+            onChange={(e) => setSampleType(e.target.value)}
+            label="Sample Type"
+          >
+            <MenuItem value="DP">Dynamic Programming</MenuItem>
+            <MenuItem value="String">String Problem</MenuItem>
+          </Select>
+        </FormControl>
+        <Button 
+          variant="contained" 
+          onClick={loadSampleData}
+          startIcon={<MenuBookIcon />}
+        >
+          Load Sample
+        </Button>
+      </Box>
+    </Paper>
 
-            <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
-              <div className="join">
-                <button
-                  type="button"
-                  className={`btn join-item ${
-                    sampleType === "DP" ? "btn-active" : ""
-                  }`}
-                  onClick={() => setSampleType("DP")}
-                >
-                  DP Problem
-                </button>
-                <button
-                  type="button"
-                  className={`btn join-item ${
-                    sampleType === "string" ? "btn-active" : ""
-                  }`}
-                  onClick={() => setSampleType("string")}
-                >
-                  String Problem
-                </button>
-              </div>
-              <button
-                type="button"
-                className="btn btn-secondary gap-2"
-                onClick={loadSampleData}
-              >
-                <Download className="w-4 h-4" />
-                Load Sample
-              </button>
-            </div>
-          </div>
+    <Paper elevation={3}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          variant="scrollable"
+          scrollButtons="auto"
+          aria-label="Problem Form Tabs"
+          sx={{ borderBottom: 1, borderColor: "divider" }}
+        >
+          <Tab label="Basic Info" icon={<DescriptionIcon />} iconPosition="start" />
+          <Tab label="Test Cases" icon={<CheckCircleIcon />} iconPosition="start" />
+          <Tab label="JS Code & Solution" icon={<CodeIcon />} iconPosition="start" />
+          <Tab label="Python Code & Solution" icon={<CodeIcon />} iconPosition="start" />
+          <Tab label="Java Code & Solution" icon={<CodeIcon />} iconPosition="start" />
+          <Tab label="Additional Info" icon={<LightbulbIcon />} iconPosition="start" />
+        </Tabs>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text text-base md:text-lg font-semibold">
-                    Title
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full text-base md:text-lg"
-                  {...register("title")}
-                  placeholder="Enter problem title"
-                />
-                {errors.title && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.title.message}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text text-base md:text-lg font-semibold">
-                    Description
-                  </span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered min-h-32 w-full text-base md:text-lg p-4 resize-y"
-                  {...register("description")}
-                  placeholder="Enter problem description"
-                />
-                {errors.description && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.description.message}
-                    </span>
-                  </label>
-                )}
-              </div>
-
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text text-base md:text-lg font-semibold">
-                    Difficulty
-                  </span>
-                </label>
-                <select
-                  className="select select-bordered w-full text-base md:text-lg"
+        {/* 1. Basic Info */}
+        <TabPanel value={tab} index={0}>
+          <Typography variant="h6" sx={{ mb: 3 }}>Title, Description, Difficulty, Tags</Typography>
+          
+          <Grid container spacing={2} display={"flex"} flexDirection={"column"}>
+            <Grid>
+              <TextField
+                fullWidth
+                label="Title"
+                {...register("title")}
+                error={!!errors.title}
+                helperText={errors.title?.message}
+              />
+            </Grid>
+            
+            <Grid>
+              <TextField
+                fullWidth
+                label="Description"
+                multiline
+                rows={4}
+                {...register("description")}
+                error={!!errors.description}
+                helperText={errors.description?.message}
+              />
+            </Grid>
+            
+            <Grid>
+              <FormControl fullWidth error={!!errors.difficulty}>
+                <InputLabel>Difficulty</InputLabel>
+                <Select
+                  label="Difficulty"
+                  value={watch('difficulty') ?? ''}
+                  onChange={e => setValue('difficulty', e.target.value)}
                   {...register("difficulty")}
                 >
-                  <option value="EASY">Easy</option>
-                  <option value="MEDIUM">Medium</option>
-                  <option value="HARD">Hard</option>
-                </select>
-                {errors.difficulty && (
-                  <label className="label">
-                    <span className="label-text-alt text-error">
-                      {errors.difficulty.message}
-                    </span>
-                  </label>
-                )}
-              </div>
-            </div>
-
-            {/* Company Tags */}
-            <div className="card bg-base-200 p-4 md:p-6 shadow-md">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
-                  <Building2 className="w-5 h-5" />
-                  Company Tags
-                </h3>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => appendCompanyTag("")}
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add Company Tag
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {companyTagFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      className="input input-bordered flex-1"
-                      {...register(`companyTag.${index}`)}
-                      placeholder="Enter company tag"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-square btn-sm"
-                      onClick={() => removeCompanyTag(index)}
-                      disabled={companyTagFields.length === 1}
-                    >
-                      <Trash2 className="w-4 h-4 text-error" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {errors.companyTag && (
-                <div className="mt-2">
-                  <span className="text-error text-sm">
-                    {errors.companyTag.message}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Tags */}
-            <div className="card bg-base-200 p-4 md:p-6 shadow-md">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  Tags
-                </h3>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => appendTag("")}
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add Tag
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {tagFields.map((field, index) => (
-                  <div key={field.id} className="flex gap-2 items-center">
-                    <input
-                      type="text"
-                      className="input input-bordered flex-1"
-                      {...register(`tags.${index}`)}
-                      placeholder="Enter tag"
-                    />
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-square btn-sm"
-                      onClick={() => removeTag(index)}
-                      disabled={tagFields.length === 1}
-                    >
-                      <Trash2 className="w-4 h-4 text-error" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              {errors.tags && (
-                <div className="mt-2">
-                  <span className="text-error text-sm">
-                    {errors.tags.message}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Test Cases */}
-            <div className="card bg-base-200 p-4 md:p-6 shadow-md">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" />
-                  Test Cases
-                </h3>
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => appendTestCase({ input: "", output: "" })}
-                >
-                  <Plus className="w-4 h-4 mr-1" /> Add Test Case
-                </button>
-              </div>
-              <div className="space-y-6">
-                {testCaseFields.map((field, index) => (
-                  <div key={field.id} className="card bg-base-100 shadow-md">
-                    <div className="card-body p-4 md:p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-base md:text-lg font-semibold">
-                          Test Case #{index + 1}
-                        </h4>
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm text-error"
-                          onClick={() => removeTestCase(index)}
-                          disabled={testCaseFields.length === 1}
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" /> Remove
-                        </button>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text font-medium">
-                              Input
-                            </span>
-                          </label>
-                          <textarea
-                            className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                            {...register(`testcases.${index}.input`)}
-                            placeholder="Enter test case input"
-                          />
-                          {errors.testcases?.[index]?.input && (
-                            <label className="label">
-                              <span className="label-text-alt text-error">
-                                {errors.testcases[index].input.message}
-                              </span>
-                            </label>
-                          )}
-                        </div>
-                        <div className="form-control">
-                          <label className="label">
-                            <span className="label-text font-medium">
-                              Expected Output
-                            </span>
-                          </label>
-                          <textarea
-                            className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                            {...register(`testcases.${index}.output`)}
-                            placeholder="Enter expected output"
-                          />
-                          {errors.testcases?.[index]?.output && (
-                            <label className="label">
-                              <span className="label-text-alt text-error">
-                                {errors.testcases[index].output.message}
-                              </span>
-                            </label>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {errors.testcases && !Array.isArray(errors.testcases) && (
-                <div className="mt-2">
-                  <span className="text-error text-sm">
-                    {errors.testcases.message}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Code Editor Sections */}
-            <div className="space-y-8">
-              {["JAVASCRIPT", "PYTHON", "JAVA"].map((language) => (
-                <div
-                  key={language}
-                  className="card bg-base-200 p-4 md:p-6 shadow-md"
-                >
-                  <h3 className="text-lg md:text-xl font-semibold mb-6 flex items-center gap-2">
-                    <Code2 className="w-5 h-5" />
-                    {language}
-                  </h3>
-
-                  <div className="space-y-6">
-                    {/* Starter Code */}
-                    <div className="card bg-base-100 shadow-md">
-                      <div className="card-body p-4 md:p-6">
-                        <h4 className="font-semibold text-base md:text-lg mb-4">
-                          Starter Code Template
-                        </h4>
-                        <div className="border rounded-md overflow-hidden">
-                          <Controller
-                            name={`codeSnippets.${language}`}
-                            control={control}
-                            render={({ field }) => (
-                              <Editor
-                                height="300px"
-                                language={language.toLowerCase()}
-                                theme="vs-dark"
-                                value={field.value}
-                                onChange={field.onChange}
-                                options={{
-                                  minimap: { enabled: false },
-                                  fontSize: 14,
-                                  lineNumbers: "on",
-                                  roundedSelection: false,
-                                  scrollBeyondLastLine: false,
-                                  automaticLayout: true,
-                                }}
-                              />
-                            )}
-                          />
-                        </div>
-                        {errors.codeSnippets?.[language] && (
-                          <div className="mt-2">
-                            <span className="text-error text-sm">
-                              {errors.codeSnippets[language].message}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Reference Solution */}
-                    <div className="card bg-base-100 shadow-md">
-                      <div className="card-body p-4 md:p-6">
-                        <h4 className="font-semibold text-base md:text-lg mb-4 flex items-center gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-success" />
-                          Reference Solution
-                        </h4>
-                        <div className="border rounded-md overflow-hidden">
-                          <Controller
-                            name={`referenceSolutions.${language}`}
-                            control={control}
-                            render={({ field }) => (
-                              <Editor
-                                height="300px"
-                                language={language.toLowerCase()}
-                                theme="vs-dark"
-                                value={field.value}
-                                onChange={field.onChange}
-                                options={{
-                                  minimap: { enabled: false },
-                                  fontSize: 14,
-                                  lineNumbers: "on",
-                                  roundedSelection: false,
-                                  scrollBeyondLastLine: false,
-                                  automaticLayout: true,
-                                }}
-                              />
-                            )}
-                          />
-                        </div>
-                        {errors.referenceSolutions?.[language] && (
-                          <div className="mt-2">
-                            <span className="text-error text-sm">
-                              {errors.referenceSolutions[language].message}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Examples */}
-                    <div className="card bg-base-100 shadow-md">
-                      <div className="card-body p-4 md:p-6">
-                        <h4 className="font-semibold text-base md:text-lg mb-4">
-                          Example
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text font-medium">
-                                Input
-                              </span>
-                            </label>
-                            <textarea
-                              className="textarea textarea-bordered min-h-20 w-full p-3 resize-y"
-                              {...register(`examples.${language}.input`)}
-                              placeholder="Example input"
-                            />
-                            {errors.examples?.[language]?.input && (
-                              <label className="label">
-                                <span className="label-text-alt text-error">
-                                  {errors.examples[language].input.message}
-                                </span>
-                              </label>
-                            )}
-                          </div>
-                          <div className="form-control">
-                            <label className="label">
-                              <span className="label-text font-medium">
-                                Output
-                              </span>
-                            </label>
-                            <textarea
-                              className="textarea textarea-bordered min-h-20 w-full p-3 resize-y"
-                              {...register(`examples.${language}.output`)}
-                              placeholder="Example output"
-                            />
-                            {errors.examples?.[language]?.output && (
-                              <label className="label">
-                                <span className="label-text-alt text-error">
-                                  {errors.examples[language].output.message}
-                                </span>
-                              </label>
-                            )}
-                          </div>
-                          <div className="form-control md:col-span-2">
-                            <label className="label">
-                              <span className="label-text font-medium">
-                                Explanation
-                              </span>
-                            </label>
-                            <textarea
-                              className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                              {...register(`examples.${language}.explanation`)}
-                              placeholder="Explain the example"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  <MenuItem value="EASY">Easy</MenuItem>
+                  <MenuItem value="MEDIUM">Medium</MenuItem>
+                  <MenuItem value="HARD">Hard</MenuItem>
+                </Select>
+                {errors.difficulty && <FormHelperText>{errors.difficulty.message}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Tags</Typography>
+              {tagFields.map((field, index) => (
+                <Box key={field.id} sx={{ display: 'flex', mb: 1, gap: 1 }}>
+                  <TextField
+                    fullWidth
+                    label={`Tag ${index + 1}`}
+                    {...register(`tags.${index}`)}
+                    error={!!errors.tags?.[index]}
+                    helperText={errors.tags?.[index]?.message}
+                  />
+                  <IconButton 
+                    color="error" 
+                    onClick={() => removeTag(index)}
+                    disabled={tagFields.length === 1}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               ))}
-            </div>
+              <Button 
+                startIcon={<AddIcon />} 
+                onClick={() => appendTag("")}
+                variant="outlined"
+                size="small"
+                sx={{ mt: 1 }}
+              >
+                Add Tag
+              </Button>
+            </Grid>
+            
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Company Tags</Typography>
+              {companyTagFields.map((field, index) => (
+                <Box key={field.id} sx={{ display: 'flex', mb: 1, gap: 1 }}>
+                  <TextField
+                    fullWidth
+                    label={`Company ${index + 1}`}
+                    {...register(`companyTag.${index}`)}
+                  />
+                  <IconButton 
+                    color="error" 
+                    onClick={() => removeCompanyTag(index)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              ))}
+              <Button 
+                startIcon={<AddIcon />} 
+                onClick={() => appendCompanyTag("")}
+                variant="outlined"
+                size="small"
+                sx={{ mt: 1 }}
+              >
+                Add Company
+              </Button>
+            </Grid>
+          </Grid>
+        </TabPanel>
 
-            {/* Additional Information */}
-            <div className="card bg-base-200 p-4 md:p-6 shadow-md">
-              <h3 className="text-lg md:text-xl font-semibold mb-6 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-warning" />
-                Additional Information
-              </h3>
-              <div className="space-y-6">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">Constraints</span>
-                  </label>
-                  <textarea
-                    className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                    {...register("constraints")}
-                    placeholder="Enter problem constraints"
+        {/* 2. Test Cases */}
+        <TabPanel value={tab} index={1}>
+          <Typography variant="h6" sx={{ mb: 3 }}>Test Cases</Typography>
+          
+          {testCaseFields.map((field, index) => (
+            <Paper key={field.id} elevation={1} sx={{ p: 2, mb: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="subtitle1">Test Case {index + 1}</Typography>
+                <IconButton 
+                  color="error" 
+                  onClick={() => removeTestCase(index)}
+                  disabled={testCaseFields.length === 1}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+              
+              <Grid container spacing={2}>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Input"
+                    multiline
+                    rows={3}
+                    {...register(`testcases.${index}.input`)}
+                    error={!!errors.testcases?.[index]?.input}
+                    helperText={errors.testcases?.[index]?.input?.message}
                   />
-                  {errors.constraints && (
-                    <label className="label">
-                      <span className="label-text-alt text-error">
-                        {errors.constraints.message}
-                      </span>
-                    </label>
-                  )}
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      Hints (Optional)
-                    </span>
-                  </label>
-                  <textarea
-                    className="textarea textarea-bordered min-h-24 w-full p-3 resize-y"
-                    {...register("hints")}
-                    placeholder="Enter hints for solving the problem"
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Output"
+                    multiline
+                    rows={3}
+                    {...register(`testcases.${index}.output`)}
+                    error={!!errors.testcases?.[index]?.output}
+                    helperText={errors.testcases?.[index]?.output?.message}
                   />
-                </div>
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-medium">
-                      Editorial (Optional)
-                    </span>
-                  </label>
-                  <textarea
-                    className="textarea textarea-bordered min-h-32 w-full p-3 resize-y"
-                    {...register("editorial")}
-                    placeholder="Enter problem editorial/solution explanation"
-                  />
-                </div>
-              </div>
-            </div>
+                </Grid>
+              </Grid>
+            </Paper>
+          ))}
+          
+          <Button 
+            startIcon={<AddIcon />} 
+            onClick={() => appendTestCase({ input: "", output: "" })}
+            variant="contained"
+            sx={{ mt: 1 }}
+          >
+            Add Test Case
+          </Button>
+        </TabPanel>
 
-            <div className="card-actions justify-end pt-4 border-t">
-              <button type="submit" className="btn btn-primary btn-lg gap-2">
-                {isLoading ? (
-                  <span className="loading loading-spinner text-white"></span>
-                ) : (
-                  <>
-                    <CheckCircle2 className="w-5 h-5" />
-                    Create Problem
-                  </>
+        {/* 3. JS Code & Solution */}
+        <TabPanel value={tab} index={2}>
+          <Typography variant="h6" sx={{ mb: 3 }}>JavaScript Starter Code & Reference Solution</Typography>
+          
+          <Grid container spacing={3} display={"flex"} flexDirection={"column"}>
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Example</Typography>
+              <Grid container spacing={2}>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Input"
+                    multiline
+                    rows={3}
+                    {...register("examples.JAVASCRIPT.input")}
+                    error={!!errors.examples?.JAVASCRIPT?.input}
+                    helperText={errors.examples?.JAVASCRIPT?.input?.message}
+                  />
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Output"
+                    multiline
+                    rows={3}
+                    {...register("examples.JAVASCRIPT.output")}
+                    error={!!errors.examples?.JAVASCRIPT?.output}
+                    helperText={errors.examples?.JAVASCRIPT?.output?.message}
+                  />
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Explanation"
+                    multiline
+                    rows={3}
+                    {...register("examples.JAVASCRIPT.explanation")}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Starter Code</Typography>
+              <Controller
+                name="codeSnippets.JAVASCRIPT"
+                control={control}
+                render={({ field }) => (
+                  <Editor
+                    height="300px"
+                    language="javascript"
+                    theme={getMonacoTheme()}
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
                 )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
-}
+              />
+              {errors.codeSnippets?.JAVASCRIPT && (
+                <FormHelperText error>{errors.codeSnippets.JAVASCRIPT.message}</FormHelperText>
+              )}
+            </Grid>
+            
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Reference Solution</Typography>
+              <Controller
+                name="referenceSolutions.JAVASCRIPT"
+                control={control}
+                render={({ field }) => (
+                  <Editor
+                    height="300px"
+                    language="javascript"
+                    value={field.value}
+                    theme={getMonacoTheme()}
+                    onChange={field.onChange}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                )}
+              />
+              {errors.referenceSolutions?.JAVASCRIPT && (
+                <FormHelperText error>{errors.referenceSolutions.JAVASCRIPT.message}</FormHelperText>
+              )}
+            </Grid>
+          </Grid>
+        </TabPanel>
 
-export default CreateProblemForm
+        {/* 4. Python Code & Solution */}
+        <TabPanel value={tab} index={3}>
+          <Typography variant="h6" sx={{ mb: 3 }}>Python Starter Code & Reference Solution</Typography>
+          
+          <Grid container spacing={3} display={"flex"} flexDirection={"column"}>
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Example</Typography>
+              <Grid container spacing={2}>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Input"
+                    multiline
+                    rows={3}
+                    {...register("examples.PYTHON.input")}
+                    error={!!errors.examples?.PYTHON?.input}
+                    helperText={errors.examples?.PYTHON?.input?.message}
+                  />
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Output"
+                    multiline
+                    rows={3}
+                    {...register("examples.PYTHON.output")}
+                    error={!!errors.examples?.PYTHON?.output}
+                    helperText={errors.examples?.PYTHON?.output?.message}
+                  />
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Explanation"
+                    multiline
+                    rows={3}
+                    {...register("examples.PYTHON.explanation")}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Starter Code</Typography>
+              <Controller
+                name="codeSnippets.PYTHON"
+                control={control}
+                render={({ field }) => (
+                  <Editor
+                    height="300px"
+                    language="python"
+                    value={field.value}
+                    theme={getMonacoTheme()}
+                    onChange={field.onChange}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                )}
+              />
+              {errors.codeSnippets?.PYTHON && (
+                <FormHelperText error>{errors.codeSnippets.PYTHON.message}</FormHelperText>
+              )}
+            </Grid>
+            
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Reference Solution</Typography>
+              <Controller
+                name="referenceSolutions.PYTHON"
+                control={control}
+                render={({ field }) => (
+                  <Editor
+                    height="300px"
+                    language="python"
+                    value={field.value}
+                    theme={getMonacoTheme()}
+                    onChange={field.onChange}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                )}
+              />
+              {errors.referenceSolutions?.PYTHON && (
+                <FormHelperText error>{errors.referenceSolutions.PYTHON.message}</FormHelperText>
+              )}
+            </Grid>
+          </Grid>
+        </TabPanel>
+
+        {/* 5. Java Code & Solution */}
+        <TabPanel value={tab} index={4} >
+          <Typography variant="h6" sx={{ mb: 3 }}>Java Starter Code & Reference Solution</Typography>
+          
+          <Grid container spacing={3} display={"flex"} flexDirection={"column"}>
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Example</Typography>
+              <Grid container spacing={2}>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Input"
+                    multiline
+                    rows={3}
+                    {...register("examples.JAVA.input")}
+                    error={!!errors.examples?.JAVA?.input}
+                    helperText={errors.examples?.JAVA?.input?.message}
+                  />
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Output"
+                    multiline
+                    rows={3}
+                    {...register("examples.JAVA.output")}
+                    error={!!errors.examples?.JAVA?.output}
+                    helperText={errors.examples?.JAVA?.output?.message}
+                  />
+                </Grid>
+                <Grid>
+                  <TextField
+                    fullWidth
+                    label="Explanation"
+                    multiline
+                    rows={3}
+                    {...register("examples.JAVA.explanation")}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid container spacing={3} display={"flex"} flexDirection={"column"}>
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Starter Code</Typography>
+              <Controller
+                name="codeSnippets.JAVA"
+                control={control}
+                render={({ field }) => (
+                  <Editor
+                    height="300px"
+                    language="java"
+                    value={field.value}
+                    theme={getMonacoTheme()}
+                    onChange={field.onChange}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                )}
+              />
+              {errors.codeSnippets?.JAVA && (
+                <FormHelperText error>{errors.codeSnippets.JAVA.message}</FormHelperText>
+              )}
+            </Grid>
+
+            <Grid>
+              <Typography variant="subtitle1" sx={{ mb: 1 }}>Reference Solution</Typography>
+              <Controller
+                name="referenceSolutions.JAVA"
+                control={control}
+                render={({ field }) => (
+                  <Editor
+                    height="300px"
+                    language="java"
+                    value={field.value}
+                    theme={getMonacoTheme()}
+                    onChange={field.onChange}
+                    options={{
+                      minimap: { enabled: false },
+                      scrollBeyondLastLine: false,
+                    }}
+                  />
+                )}
+              />
+              {errors.referenceSolutions?.JAVA && (
+                <FormHelperText error>{errors.referenceSolutions.JAVA.message}</FormHelperText>
+              )}
+            </Grid>
+          </Grid>
+
+          </Grid>
+        </TabPanel>
+        {/* 6. Additional Info */}
+        <TabPanel value={tab} index={5}>
+          <Typography variant="h6" sx={{ mb: 3 }}>Additional Information</Typography>
+          
+          <Grid container spacing={3} display={"flex"} flexDirection={"column"}>
+            <Grid>
+              <TextField
+                fullWidth
+                label="Constraints"
+                multiline
+                rows={3}
+                {...register("constraints")}
+                error={!!errors.constraints}
+                helperText={errors.constraints?.message}
+              />
+            </Grid>
+            
+            <Grid>
+              <TextField
+                fullWidth
+                label="Hints"
+                multiline
+                rows={3}
+                {...register("hints")}
+              />
+            </Grid>
+            
+            <Grid>
+              <TextField
+                fullWidth
+                label="Editorial"
+                multiline
+                rows={5}
+                {...register("editorial")}
+              />
+            </Grid>
+          </Grid>
+        </TabPanel>
+
+        <Box sx={{ display: "flex", justifyContent: "space-between", p: 3, borderTop: 1, borderColor: "divider" }}>
+          <Button 
+            variant="outlined" 
+            onClick={() => setTab(prev => Math.max(0, prev - 1))}
+            disabled={tab === 0}
+          >
+            Previous
+          </Button>
+  
+          {tab < 5 ? (
+            <Button 
+              variant="contained" 
+              onClick={() => setTab(prev => Math.min(5, prev + 1))}
+            >
+              Next
+            </Button>
+          ) : (
+            <Button 
+              variant="contained" 
+              color="primary" 
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? "Submitting..." : "Submit Problem"}
+            </Button>
+          )}
+        </Box>
+
+      </form>
+    </Paper>
+  </Box>
+);
+
+};
+
+export default CreateProblemForm;
