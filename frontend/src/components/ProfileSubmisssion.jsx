@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSubmissionStore } from '../store/useSubmissionStore';
-import { Code, Terminal, Clock, HardDrive, Check, X, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Code, Terminal, Clock, HardDrive, Check, X, ChevronDown, ChevronUp, Filter, ArrowLeft } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Link } from 'react-router-dom';
 
 const ProfileSubmission = () => {
   const { submissions, getAllSubmissions } = useSubmissionStore();
@@ -70,10 +71,12 @@ const ProfileSubmission = () => {
 
   return (
     <div className="w-full min-h-screen bg-base-200 p-4 md:p-8">
+      <Link to="/newpage" className="arrow">
+          <ArrowLeft />
+      </Link>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-primary mb-4 md:mb-0">My Submissions</h1>
-          
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto justify-center items-center">
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-outline gap-2">

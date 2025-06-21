@@ -175,7 +175,7 @@ const ProblemSolvedByUser = () => {
 )}
 
 
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{width: 1, mb: 4 }}>
           <ContributionGraph />
         </Box>
       </Container>

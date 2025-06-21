@@ -48,7 +48,7 @@ const NewPage = () => {
           <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
 
         {/* Scrollable Main Content */}
-        <main className="ml-2 flex-1 overflow-y-auto h-screen p-5 w-full">
+        <main className="ml-2 flex-1 overflow-y-auto h-screen p-1 w-full">
           <ContentComponent />
         </main>
       </div>

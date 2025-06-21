@@ -3,7 +3,6 @@ import { Activity, Calendar, TrendingUp } from 'lucide-react';
 import { useSubmissionStore } from '../store/useSubmissionStore';
 import { useThemeContext } from '../context/Theme';
 
-// Enhanced CalendarHeatmap component with proper month positioning and responsive squares
 const CalendarHeatmap = ({ startDate, endDate, values, classForValue, showMonthLabels }) => {
   const getDaysInYear = () => {
     const days = [];
@@ -26,26 +25,21 @@ const CalendarHeatmap = ({ startDate, endDate, values, classForValue, showMonthL
 
   const days = getDaysInYear();
   const weeks = [];
-
-  // Group days into weeks, starting from Sunday
   let currentWeek = [];
+
   days.forEach((day, index) => {
     if (index === 0) {
-      // Fill empty slots at the beginning of first week
       for (let i = 0; i < day.dayOfWeek; i++) {
         currentWeek.push(null);
       }
     }
-
     currentWeek.push(day);
-
     if (currentWeek.length === 7) {
       weeks.push(currentWeek);
       currentWeek = [];
     }
   });
 
-  // Add remaining days
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) {
       currentWeek.push(null);
@@ -58,7 +52,6 @@ const CalendarHeatmap = ({ startDate, endDate, values, classForValue, showMonthL
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
   ];
 
-  // Calculate month positions based on weeks
   const getMonthPositions = () => {
     const positions = [];
     let currentMonth = -1;
@@ -80,10 +73,13 @@ const CalendarHeatmap = ({ startDate, endDate, values, classForValue, showMonthL
   const monthPositions = getMonthPositions();
 
   return (
-    <div className="calendar-heatmap ">
+    <div className="calendar-heatmap w-full">
       {showMonthLabels && (
         <div className="relative mb-4">
-          <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${weeks.length}, 1fr)` }}>
+          <div
+            className="grid gap-1"
+            style={{ gridTemplateColumns: `repeat(${weeks.length}, minmax(0, 1fr))` }}
+          >
             {monthPositions.map((monthData, index) => (
               <div
                 key={`${monthData.month}-${index}`}
@@ -97,9 +93,9 @@ const CalendarHeatmap = ({ startDate, endDate, values, classForValue, showMonthL
         </div>
       )}
 
-      {/* Day labels */}
+      {/* Day labels and grid */}
       <div className="flex mb-2">
-        <div className="w-10 sm:w-12 flex flex-col gap-1 text-xs sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 mr-2">
+        <div className="w-5 sm:w-5 md:w-14 flex flex-col gap-1 text-xs sm:text-xs md:text-sm text-gray-500 dark:text-gray-400 mr-2">
           <div className="h-3"></div>
           <div>Mon</div>
           <div className="h-3"></div>
@@ -109,13 +105,13 @@ const CalendarHeatmap = ({ startDate, endDate, values, classForValue, showMonthL
           <div className="h-3"></div>
         </div>
 
-        <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${weeks.length}, 1fr)` }}>
+        <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${weeks.length}, minmax(0, 1fr))` }}>
           {weeks.map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col gap-1">
               {week.map((day, dayIndex) => (
                 <div
                   key={day ? day.date : `empty-${weekIndex}-${dayIndex}`}
-                  className={`w-2 h-2 sm:w-3 sm:h-3 rounded-sm transition-all duration-200 hover:scale-110 cursor-pointer ${
+                  className={`w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 rounded-sm transition-all duration-200 hover:scale-110 cursor-pointer ${
                     day ? day.className : 'bg-transparent'
                   }`}
                   title={day ? `${day.date}: ${day.count} contributions` : ''}
@@ -140,7 +136,7 @@ function ContributionGraph() {
 
   const aggregated = Object.values(
     submissionCounts.reduce((acc, curr) => {
-      const dateStr = (typeof curr.date === "string")
+      const dateStr = typeof curr.date === 'string'
         ? curr.date.slice(0, 10)
         : curr.date.toISOString().slice(0, 10);
       if (!acc[dateStr]) {
@@ -155,19 +151,17 @@ function ContributionGraph() {
   const startDate = new Date();
   startDate.setFullYear(startDate.getFullYear() - 1);
 
-  // Calculate stats
   const totalContributions = aggregated.reduce((sum, item) => sum + item.count, 0);
   const activeDays = aggregated.filter(item => item.count > 0).length;
-  const currentStreak = 0; // You can implement streak calculation based on your needs
+  const currentStreak = 0;
 
   return (
-    <div className={`transition-all duration-500 ${
+    <div className={`w-full transition-all duration-500 ${
       isDarkMode
         ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white'
         : 'bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900'
     }`}>
       <div className="container mx-auto px-2 sm:px-4 md:px-6 py-6 md:py-8">
-        {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center space-x-4">
             <div className={`p-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all duration-300 ${
@@ -188,8 +182,8 @@ function ContributionGraph() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                 {/* Stats Cards */}
+         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
           <div className={`group p-4 sm:p-6 rounded-2xl backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:-translate-y-1 cursor-pointer ${
             isDarkMode
               ? 'bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/50 shadow-xl shadow-gray-900/20 hover:shadow-2xl hover:shadow-green-500/10 hover:border-green-500/30'
@@ -273,34 +267,36 @@ function ContributionGraph() {
             </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <CalendarHeatmap
-              startDate={startDate}
-              endDate={endDate}
-              values={aggregated}
-              classForValue={value => {
-                if (!value) return `color-empty ${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-600/40' : 'bg-gray-200 hover:bg-gray-300'}`;
-                if (value.count >= 4) return `color-scale-4 ${isDarkMode ? 'bg-green-400 hover:bg-green-300 shadow-sm shadow-green-400/50' : 'bg-green-600 hover:bg-green-700 shadow-sm shadow-green-600/50'}`;
-                if (value.count >= 3) return `color-scale-3 ${isDarkMode ? 'bg-green-500 hover:bg-green-400 shadow-sm shadow-green-500/50' : 'bg-green-500 hover:bg-green-600 shadow-sm shadow-green-500/50'}`;
-                if (value.count >= 2) return `color-scale-2 ${isDarkMode ? 'bg-green-600 hover:bg-green-500 shadow-sm shadow-green-600/50' : 'bg-green-400 hover:bg-green-500 shadow-sm shadow-green-400/50'}`;
-                if (value.count >= 1) return `color-scale-1 ${isDarkMode ? 'bg-green-800 hover:bg-green-700 shadow-sm shadow-green-800/50' : 'bg-green-300 hover:bg-green-400 shadow-sm shadow-green-300/50'}`;
-                return `color-empty ${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-600/40' : 'bg-gray-200 hover:bg-gray-300'}`;
-              }}
-              showMonthLabels={true}
-            />
+          <div className="w-full overflow-x-auto">
+            <div className="min-w-[700px]">
+              <CalendarHeatmap
+                startDate={startDate}
+                endDate={endDate}
+                values={aggregated}
+                classForValue={value => {
+                  if (!value) return `color-empty ${isDarkMode ? 'bg-gray-700/30 hover:bg-gray-600/40' : 'bg-gray-200 hover:bg-gray-300'}`;
+
+                  if (value.count >= 4) return `bg-green-600 hover:bg-green-700 shadow-sm shadow-green-600/50`;
+                  if (value.count >= 3) return `bg-green-500 hover:bg-green-600 shadow-sm shadow-green-500/50`;
+                  if (value.count >= 2) return `bg-green-400 hover:bg-green-500 shadow-sm shadow-green-400/50`;
+                  if (value.count >= 1) return `bg-green-300 hover:bg-green-400 shadow-sm shadow-green-300/50`;
+                  return `bg-gray-200 hover:bg-gray-300`;
+                }}
+                showMonthLabels={true}
+              />
+            </div>
           </div>
 
-          {/* Legend */}
           <div className="flex flex-wrap items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-gray-700 gap-2">
             <span className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               Less
             </span>
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-sm transition-all duration-200 hover:scale-110 ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-200'}`}></div>
-              <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-sm transition-all duration-200 hover:scale-110 ${isDarkMode ? 'bg-green-800' : 'bg-green-300'}`}></div>
-              <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-sm transition-all duration-200 hover:scale-110 ${isDarkMode ? 'bg-green-600' : 'bg-green-400'}`}></div>
-              <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-sm transition-all duration-200 hover:scale-110 ${isDarkMode ? 'bg-green-500' : 'bg-green-500'}`}></div>
-              <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-sm transition-all duration-200 hover:scale-110 ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></div>
+              <div className={`w-3 h-3 rounded-sm ${isDarkMode ? 'bg-gray-700/30' : 'bg-gray-200'}`}></div>
+              <div className={`w-3 h-3 rounded-sm ${isDarkMode ? 'bg-green-800' : 'bg-green-300'}`}></div>
+              <div className={`w-3 h-3 rounded-sm ${isDarkMode ? 'bg-green-600' : 'bg-green-400'}`}></div>
+              <div className={`w-3 h-3 rounded-sm ${isDarkMode ? 'bg-green-500' : 'bg-green-500'}`}></div>
+              <div className={`w-3 h-3 rounded-sm ${isDarkMode ? 'bg-green-400' : 'bg-green-600'}`}></div>
             </div>
             <span className={`text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               More
