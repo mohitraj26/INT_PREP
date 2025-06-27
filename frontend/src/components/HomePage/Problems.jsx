@@ -50,7 +50,6 @@ const ProblemTable = () => {
     getAllProblems();
   }, [getAllProblems]);
 
-  console.log(problems)
 
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return [];

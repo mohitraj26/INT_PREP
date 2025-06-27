@@ -1,5 +1,4 @@
-import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -24,7 +23,6 @@ import {
   Alert,
 } from "@mui/material";
 import {
-  ArrowBack,
   Email,
   Person,
   Security,
@@ -34,6 +32,7 @@ import {
   Close,
 } from "@mui/icons-material";
 import { useAuthStore } from "../store/useAuthStore";
+import { useUserStore } from '../store/useUserStore';
 import { useThemeContext } from "../context/Theme"; 
 
 // Utility to get initials
@@ -46,10 +45,10 @@ function getInitials(name) {
 
 const ProfilePage = () => {
   const { authUser, setAuthUser } = useAuthStore();
+  const { updateName, updateEmail, updateProfileImage } = useUserStore();
   const { isDarkMode } = useThemeContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
 
   // Modal states
   const [editOpen, setEditOpen] = useState(false);
@@ -76,13 +75,33 @@ const ProfilePage = () => {
     setEditData({ ...editData, [e.target.name]: e.target.value });
   };
 
-  const handleProfileUpdate = (e) => {
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    setAuthUser({ ...authUser, ...editData });
-    setEditOpen(false);
-    setAlertMessage("Profile updated successfully!");
-    setAlertSeverity("success");
-    setTimeout(() => setAlertMessage(""), 3000);
+    let updatedUser = { ...authUser };
+    try {
+      if (editData.name !== authUser.name) {
+        const updated = await updateName(authUser.id, editData.name);
+        updatedUser.name = updated.name;
+      }
+      if (editData.email !== authUser.email) {
+        const updated = await updateEmail(authUser.id, editData.email);
+        updatedUser.email = updated.email;
+      }
+      if (editData.image !== authUser.image) {
+        const updated = await updateProfileImage(authUser.id, editData.image);
+        updatedUser.image = updated.image;
+      }
+      setAuthUser(updatedUser);
+      setEditOpen(false);
+      setAlertMessage("Profile updated successfully!");
+      setAlertSeverity("success");
+    } catch (error) {
+      console.error("Full update error:", error);
+      setAlertMessage("Profile update failed");
+      setAlertSeverity("error");
+    } finally {
+      setTimeout(() => setAlertMessage(""), 3000);
+    }
   };
 
   // Change Password Handlers
@@ -90,7 +109,7 @@ const ProfilePage = () => {
     setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setAlertMessage("New passwords do not match!");
@@ -98,15 +117,24 @@ const ProfilePage = () => {
       setTimeout(() => setAlertMessage(""), 3000);
       return;
     }
-    setPasswordOpen(false);
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-    setAlertMessage("Password changed successfully!");
-    setAlertSeverity("success");
-    setTimeout(() => setAlertMessage(""), 3000);
+    try {
+      // Assuming you have an axiosInstance configured
+      const res = await axiosInstance.put("/auth/change-password", {
+        userId: authUser.id,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      });
+      setAlertMessage(res.data.message || "Password changed successfully!");
+      setAlertSeverity("success");
+      setPasswordOpen(false);
+    } catch (err) {
+      console.error("Password change error", err);
+      setAlertMessage(err.response?.data?.message || "Failed to change password");
+      setAlertSeverity("error");
+    } finally {
+      setTimeout(() => setAlertMessage(""), 3000);
+      setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
+    }
   };
 
   const handleCloseEdit = () => {
@@ -170,8 +198,8 @@ const ProfilePage = () => {
         )}
 
         {/* Main Content */}
-        <Grid container spacing={3} justifyContent="center" width={"full"}>
-          <Grid size={{ xs: 12, lg: 8 }}>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid xs={12} lg={8}>
             <Card
               elevation={3}
               sx={{
@@ -241,7 +269,7 @@ const ProfilePage = () => {
                 {/* User Information Grid */}
                 <Grid container spacing={2}>
                   {/* Email */}
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid xs={12} sm={6}>
                     <Paper
                       elevation={1}
                       sx={{
@@ -271,7 +299,7 @@ const ProfilePage = () => {
                   </Grid>
 
                   {/* User ID */}
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid xs={12} sm={6}>
                     <Paper
                       elevation={1}
                       sx={{
@@ -301,7 +329,7 @@ const ProfilePage = () => {
                   </Grid>
 
                   {/* Role Status */}
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid xs={12} sm={6}>
                     <Paper
                       elevation={1}
                       sx={{
@@ -328,7 +356,7 @@ const ProfilePage = () => {
                   </Grid>
 
                   {/* Profile Image Status */}
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid xs={12} sm={6}>
                     <Paper
                       elevation={1}
                       sx={{
@@ -399,10 +427,8 @@ const ProfilePage = () => {
           },
         }}
       >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Edit Profile
-          </Typography>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontWeight: 'bold' }}>
+          Edit Profile
           <IconButton onClick={handleCloseEdit} size="small">
             <Close />
           </IconButton>
@@ -464,10 +490,8 @@ const ProfilePage = () => {
           },
         }}
       >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            Change Password
-          </Typography>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontWeight: 'bold' }}>
+          Change Password
           <IconButton onClick={handleClosePassword} size="small">
             <Close />
           </IconButton>
