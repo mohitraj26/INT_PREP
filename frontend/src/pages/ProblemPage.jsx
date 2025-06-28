@@ -42,7 +42,6 @@ const ProblemPage = () => {
   const { runCode, submitCode, submission, isExecuting } = useExecutionStore();
   const { authUser } = useAuthStore();
   const testCasePanelRef = useRef(null);
-
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 768);
