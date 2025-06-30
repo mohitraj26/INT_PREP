@@ -5,7 +5,8 @@ import {
   Play, FileText, MessageSquare, Lightbulb, Bookmark,
   Share2, Clock, ChevronRight, BookOpen, Terminal,
   Code2, Users, ThumbsUp, Home, Check, X,
-  ChevronUp, ChevronDown, Loader2, Menu
+  ChevronUp, ChevronDown, Loader2, Menu,
+  BotMessageSquare
 } from "lucide-react";
 import { User, Code, LogOut } from "lucide-react";
 import LogoutButton from "../components/LogoutButton";
@@ -17,6 +18,8 @@ import SubmissionResults from '../components/Submission';
 import SubmissionList from '../components/SubmissionList';
 import { useAuthStore } from "../store/useAuthStore";
 import { Resizable } from 're-resizable';
+import { getAIReview } from '../lib/ai';
+import Markdown from "react-markdown"
 
 const ProblemPage = () => {
   const { id } = useParams();
@@ -38,6 +41,10 @@ const ProblemPage = () => {
   const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   const [showDescription, setShowDescription] = useState(true);
   const [executionResults, setExecutionResults] = useState(null);
+
+  const [aiReview, setAIReview] = useState(null);
+  const [isReviewLoading, setIsReviewLoading] = useState(false);
+
 
   const { runCode, submitCode, submission, isExecuting } = useExecutionStore();
   const { authUser } = useAuthStore();
@@ -71,6 +78,27 @@ const ProblemPage = () => {
       getSubmissionForProblem(id);
     }
   }, [activeTab, id]);
+
+//   useEffect(() => {
+//   if (activeTab === "AI Review" && code) {
+//     const fetchAIReview = async () => {
+//       setIsReviewLoading(true);
+//       try {
+//         console.log("Type of code:", typeof code);
+//         const review = await getAIReview(code);
+//         console.log(review);
+//         setAIReview(review);
+//       } catch (error) {
+//         console.error("Error fetching AI Review:", error);
+//         setAIReview("Failed to fetch AI review.");
+//       }
+//       setIsReviewLoading(false);
+//     };
+
+//     fetchAIReview();
+//   }
+// }, [activeTab, code, selectedLanguage, id]);
+
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -161,8 +189,22 @@ function CompanyBadges({ companies }) {
   );
 }
 
-// Usage
-// <CompanyBadges companies={problem.companyTag} />
+
+
+const handleAskAI = async () => {
+  if (!code) return;
+
+  setIsReviewLoading(true);
+  setAIReview(""); // Optional: Clear previous review
+  try {
+    const review = await getAIReview(code); // Your AI API call
+    setAIReview(review);
+  } catch (error) {
+    console.error("Failed to fetch AI review:", error);
+    setAIReview("⚠️ Unable to generate review at the moment. Please try again.");
+  }
+  setIsReviewLoading(false);
+};
 
 
   const renderTabContent = () => {
@@ -273,7 +315,38 @@ function CompanyBadges({ companies }) {
             )}
           </div>
         );
-      default:
+      
+case "AI Review":
+  return (
+    <div className="p-4">
+      <div className="bg-base-200 p-6 rounded-xl">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Hey there!</h2>
+          <button
+            onClick={handleAskAI}
+            className="btn btn-primary btn-sm"
+            disabled={isReviewLoading}
+          >
+            Ask AI
+          </button>
+        </div>
+
+        {isReviewLoading ? (
+          <div className="flex items-center gap-2 text-base-content/70">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span>Analyzing your code...</span>
+          </div>
+        ) : (
+          <p className="text-base-content whitespace-pre-wrap">
+            <Markdown>{aiReview}</Markdown>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+        
+        default:
         return null;
     }
   };
@@ -608,6 +681,14 @@ function CompanyBadges({ companies }) {
                       <Lightbulb className="w-4 h-4" />
                       Hints
                     </button>
+                    <button
+                      className={`tab gap-2 ${activeTab === "AI Review" ? "tab-active" : ""}`}
+                      onClick={() => setActiveTab("AI Review")}
+                    >
+                      <BotMessageSquare />
+                      Ask AI
+                    </button>
+
                   </div>
 
                   <div className="p-6 overflow-y-auto flex-1">

@@ -10,6 +10,7 @@ import executionRoute from "./routes/executeCode.route.js";
 import submissionRoutes from "./routes/submission.route.js";
 import playlistRoutes from "./routes/playlist.route.js";
 import userRoutes from "./routes/user.routes.js";
+import aiRoutes from "./routes/ai.routes.js";
 
 dotenv.config();
 const app = express();
@@ -52,6 +53,7 @@ app.use("/api/v1/execute-code", executionRoute);
 app.use("/api/v1/submission", submissionRoutes);
 app.use("/api/v1/playlist" , playlistRoutes);
 app.use("/api/v1/user" , userRoutes);
+app.use("/api/v1/ai" , aiRoutes);
 
 app.listen(process.env.PORT,()=>{
     console.log("Server is running on port 8080");
