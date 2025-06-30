@@ -510,6 +510,13 @@ case "AI Review":
               <Lightbulb className="w-4 h-4" />
               Hints
             </button>
+            <button
+              className={`tab gap-2 ${activeTab === "AI Review" ? "tab-active" : ""}`}
+              onClick={() => setActiveTab("AI Review")}
+            >
+              <BotMessageSquare />
+              Ask AI
+            </button>
           </div>
         </div>
       )}
